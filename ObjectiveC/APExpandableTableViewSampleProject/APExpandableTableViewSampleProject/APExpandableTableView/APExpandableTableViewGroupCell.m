@@ -18,7 +18,7 @@
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
         self.indicator = [[UIImageView alloc] initWithFrame:CGRectZero];
-//        self.indicator.image = IMAGE_ARROW_DOWN;
+        self.indicator.image = [APExpandableTableViewGroupCell defaultIndicatorImage];
         self.indicator.contentMode = UIViewContentModeCenter;
         [self.contentView addSubview:self.indicator];
         self.indicatorOnLeft = YES;
@@ -85,5 +85,24 @@
     }
 }
 
++ (UIImage *)defaultIndicatorImage {
+    static UIImage *indicatorImage = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        UIGraphicsBeginImageContextWithOptions(CGSizeMake(20.f, 20.f), NO, 0.0f);
+        CGContextRef ctx = UIGraphicsGetCurrentContext();
+        CGContextSaveGState(ctx);
+        CGContextSetStrokeColorWithColor(ctx, [UIColor blackColor].CGColor);
+        CGContextSetLineWidth(ctx, 1.0f);
+        CGContextMoveToPoint(ctx, 2, 6);
+        CGContextAddLineToPoint(ctx, 10, 14);
+        CGContextAddLineToPoint(ctx, 18, 6);
+        CGContextStrokePath(ctx);
+        CGContextRestoreGState(ctx);
+        indicatorImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    });
+    return indicatorImage;
+}
 
 @end
