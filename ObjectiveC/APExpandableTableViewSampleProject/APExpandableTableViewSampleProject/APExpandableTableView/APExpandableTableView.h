@@ -52,11 +52,15 @@
 - (void)expandableTableView:(APExpandableTableView *)tableView didSelectGroupAtIndex:(NSInteger)groupIndex;
 
 // Moving cells
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canMoveGroupAtIndex:(NSInteger)groupIndex;
 - (void)expandableTableView:(APExpandableTableView *)tableView moveGroupAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex;
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (void)expandableTableView:(APExpandableTableView *)tableView moveChildAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex groupIndex:(NSInteger)groupIndex;
 
 // Deleting cells
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canDeleteGroupAtIndex:(NSInteger)groupIndex;
 - (void)expandableTableView:(APExpandableTableView *)tableView deleteGroupAtIndex:(NSInteger)groupIndex;
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canDeleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (void)expandableTableView:(APExpandableTableView *)tableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 
 // Visual stuff

@@ -29,7 +29,9 @@
 
 // Callbacks for selecting, moving and deleting
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView didSelectChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
+- (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView moveChildAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex groupIndex:(NSInteger)groupIndex;
+- (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canDeleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 
 // Visual

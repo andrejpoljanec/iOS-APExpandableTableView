@@ -245,20 +245,26 @@
     }
 }
 
-// TODO
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteGroupAtIndex:)]) {
+        return [self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
+    } else {
+        return YES;
+    }
 }
 
-// TODO
 -(BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     // Can only move a group in the outer table
-    return indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1];
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canMoveGroupAtIndex:)]) {
+        return (indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1]) && [self.expandableTableViewDelegate expandableTableView:self canMoveGroupAtIndex:[self groupIndexForRow:indexPath.row]];
+    } else {
+        return indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1];
+    }
 }
 
 -(NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    // Can only move to a position of a group cell in the outer table
     if (proposedDestinationIndexPath.row == 0 || [self groupIndexForRow:proposedDestinationIndexPath.row - 1] != [self groupIndexForRow:proposedDestinationIndexPath.row]) {
-        // Can only move to a position of a group cell in the outer table
         return proposedDestinationIndexPath;
     } else {
         return sourceIndexPath;
@@ -284,7 +290,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    // TODO: handle other editing styles
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:deleteGroupAtIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self deleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
         [self reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
@@ -331,6 +336,14 @@
     return [self.expandableTableViewDelegate expandableTableView:self cellForChildAtIndex:childIndex groupIndex:groupIndex];
 }
 
+- (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canDeleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableViewChildTableView:canDeleteChildAtIndex:groupIndex:)]) {
+        return [self.expandableTableViewDelegate expandableTableView:self canDeleteChildAtIndex:childIndex groupIndex:groupIndex];
+    } else {
+        return YES;
+    }
+}
+
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:deleteChildAtIndex:groupIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self deleteChildAtIndex:childIndex groupIndex:groupIndex];
@@ -340,6 +353,14 @@
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView didSelectChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:didSelectChildAtIndex:groupIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self didSelectChildAtIndex:childIndex groupIndex:groupIndex];
+    }
+}
+
+- (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableViewChildTableView:canMoveChildAtIndex:groupIndex:)]) {
+        return [self.expandableTableViewDelegate expandableTableView:self canMoveChildAtIndex:childIndex groupIndex:groupIndex];
+    } else {
+        return YES;
     }
 }
 

@@ -93,19 +93,20 @@
     }
 }
 
-// TODO
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:canDeleteChildAtIndex:groupIndex:)]) {
+        return [self.delegate expandableTableViewChildTableView:self canDeleteChildAtIndex:indexPath.row groupIndex:self.groupIndex];
+    } else {
+        return YES;
+    }
 }
 
-// TODO
 -(BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
-}
-
-// TODO
--(NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    return proposedDestinationIndexPath;
+    if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:canMoveChildAtIndex:groupIndex:)]) {
+        return [self.delegate expandableTableViewChildTableView:self canMoveChildAtIndex:indexPath.row groupIndex:self.groupIndex];
+    } else {
+        return YES;
+    }
 }
 
 -(void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
@@ -115,7 +116,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    // TODO
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:deleteChildAtIndex:groupIndex:)]) {
         [self.delegate expandableTableViewChildTableView:self deleteChildAtIndex:indexPath.row groupIndex:self.groupIndex];
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
