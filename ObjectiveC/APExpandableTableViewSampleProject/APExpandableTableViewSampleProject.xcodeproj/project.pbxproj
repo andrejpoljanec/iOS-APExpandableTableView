@@ -14,6 +14,9 @@
 		B4C67F461AF46BCC00699CB5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B4C67F451AF46BCC00699CB5 /* Images.xcassets */; };
 		B4C67F491AF46BCC00699CB5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B4C67F471AF46BCC00699CB5 /* LaunchScreen.xib */; };
 		B4C67F551AF46BCC00699CB5 /* APExpandableTableViewSampleProjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F541AF46BCC00699CB5 /* APExpandableTableViewSampleProjectTests.m */; };
+		B4C67F611AF46C6C00699CB5 /* APExpandableTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F601AF46C6C00699CB5 /* APExpandableTableView.m */; };
+		B4C67F641AF46C8600699CB5 /* APExpandableTableViewChildTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F631AF46C8600699CB5 /* APExpandableTableViewChildTableView.m */; };
+		B4C67F671AF46C9700699CB5 /* APExpandableTableViewGroupCell.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +43,12 @@
 		B4C67F4E1AF46BCC00699CB5 /* APExpandableTableViewSampleProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = APExpandableTableViewSampleProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4C67F531AF46BCC00699CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B4C67F541AF46BCC00699CB5 /* APExpandableTableViewSampleProjectTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APExpandableTableViewSampleProjectTests.m; sourceTree = "<group>"; };
+		B4C67F5F1AF46C6C00699CB5 /* APExpandableTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APExpandableTableView.h; path = APExpandableTableView/APExpandableTableView.h; sourceTree = "<group>"; };
+		B4C67F601AF46C6C00699CB5 /* APExpandableTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APExpandableTableView.m; path = APExpandableTableView/APExpandableTableView.m; sourceTree = "<group>"; };
+		B4C67F621AF46C8600699CB5 /* APExpandableTableViewChildTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APExpandableTableViewChildTableView.h; path = APExpandableTableView/APExpandableTableViewChildTableView.h; sourceTree = "<group>"; };
+		B4C67F631AF46C8600699CB5 /* APExpandableTableViewChildTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APExpandableTableViewChildTableView.m; path = APExpandableTableView/APExpandableTableViewChildTableView.m; sourceTree = "<group>"; };
+		B4C67F651AF46C9700699CB5 /* APExpandableTableViewGroupCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APExpandableTableViewGroupCell.h; path = APExpandableTableView/APExpandableTableViewGroupCell.h; sourceTree = "<group>"; };
+		B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APExpandableTableViewGroupCell.m; path = APExpandableTableView/APExpandableTableViewGroupCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +90,7 @@
 		B4C67F371AF46BCC00699CB5 /* APExpandableTableViewSampleProject */ = {
 			isa = PBXGroup;
 			children = (
+				B4C67F5E1AF46C1400699CB5 /* APExpandableTableView */,
 				B4C67F3C1AF46BCC00699CB5 /* AppDelegate.h */,
 				B4C67F3D1AF46BCC00699CB5 /* AppDelegate.m */,
 				B4C67F3F1AF46BCC00699CB5 /* ViewController.h */,
@@ -117,6 +127,19 @@
 				B4C67F531AF46BCC00699CB5 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		B4C67F5E1AF46C1400699CB5 /* APExpandableTableView */ = {
+			isa = PBXGroup;
+			children = (
+				B4C67F5F1AF46C6C00699CB5 /* APExpandableTableView.h */,
+				B4C67F601AF46C6C00699CB5 /* APExpandableTableView.m */,
+				B4C67F621AF46C8600699CB5 /* APExpandableTableViewChildTableView.h */,
+				B4C67F631AF46C8600699CB5 /* APExpandableTableViewChildTableView.m */,
+				B4C67F651AF46C9700699CB5 /* APExpandableTableViewGroupCell.h */,
+				B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */,
+			);
+			name = APExpandableTableView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,8 +242,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4C67F671AF46C9700699CB5 /* APExpandableTableViewGroupCell.m in Sources */,
+				B4C67F641AF46C8600699CB5 /* APExpandableTableViewChildTableView.m in Sources */,
 				B4C67F411AF46BCC00699CB5 /* ViewController.m in Sources */,
 				B4C67F3E1AF46BCC00699CB5 /* AppDelegate.m in Sources */,
+				B4C67F611AF46C6C00699CB5 /* APExpandableTableView.m in Sources */,
 				B4C67F3B1AF46BCC00699CB5 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

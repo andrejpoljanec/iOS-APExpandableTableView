@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "APExpandableTableView.h"
 
-@interface ViewController : UIViewController
+@interface ViewController : UIViewController <APExpandableTableViewDelegate>
 
+@property (weak, nonatomic) IBOutlet APExpandableTableView *expandableTableView;
 
 @end
 

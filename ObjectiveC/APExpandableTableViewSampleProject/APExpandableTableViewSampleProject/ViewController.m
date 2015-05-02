@@ -16,12 +16,43 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.expandableTableView.expandableTableViewDelegate = self;
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (NSInteger)expandableTableView:(APExpandableTableView *)tableView numberOfChildrenForGroupAtIndex:(NSInteger)groupIndex {
+    return 2;
 }
+
+- (NSInteger)numberOfGroupsInExpandableTableView:(APExpandableTableView *)tableView {
+    return 2;
+}
+
+- (UITableViewCell *)expandableTableView:(APExpandableTableView *)tableView cellForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    NSString *cellIdentifier = @"SampleChildCell";
+    
+    UITableViewCell *cell = [self.expandableTableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"Child cell #%ld", childIndex];
+    
+    return cell;
+}
+
+- (UITableViewCell *)expandableTableView:(APExpandableTableView *)tableView cellForGroupAtIndex:(NSInteger)groupIndex {
+    NSString *cellIdentifier = @"SampleGroupCell";
+    
+    UITableViewCell *cell = [self.expandableTableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+    
+    cell.textLabel.text = [NSString stringWithFormat:@"Parent cell #%ld", groupIndex];
+    
+    return cell;
+}
+
 
 @end
