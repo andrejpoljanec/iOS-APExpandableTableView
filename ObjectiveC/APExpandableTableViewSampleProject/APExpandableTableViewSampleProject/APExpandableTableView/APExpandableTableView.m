@@ -245,12 +245,47 @@
     }
 }
 
+// Table can still edit the row if the child table is editable and group is not
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    BOOL canEdit = NO;
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteGroupAtIndex:)]) {
+        canEdit = [self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
+    }
+    if (!canEdit && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canMoveChildAtIndex:groupIndex:)]) {
+        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:indexPath.row]; i++) {
+            if ([self.expandableTableViewDelegate expandableTableView:self canMoveChildAtIndex:i groupIndex:indexPath.row]) {
+                canEdit = YES;
+                break;
+            }
+        }
+    }
+    if (!canEdit && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteChildAtIndex:groupIndex:)]) {
+        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:indexPath.row]; i++) {
+            if ([self.expandableTableViewDelegate expandableTableView:self canDeleteChildAtIndex:i groupIndex:indexPath.row]) {
+                canEdit = YES;
+                break;
+            }
+        }
+    }
+    return canEdit;
+}
+
+// If only child table is editable, then set editing style for the group to none
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteGroupAtIndex:)]) {
+        if ([self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:[self groupIndexForRow:indexPath.row]]) {
+            return UITableViewCellEditingStyleDelete;
+        }
+    }
+    return UITableViewCellEditingStyleNone;
+}
+
+// If only child table is editable, then don't indent
+-(BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteGroupAtIndex:)]) {
         return [self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
-    } else {
-        return YES;
     }
+    return NO;
 }
 
 -(BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -258,7 +293,7 @@
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canMoveGroupAtIndex:)]) {
         return (indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1]) && [self.expandableTableViewDelegate expandableTableView:self canMoveGroupAtIndex:[self groupIndexForRow:indexPath.row]];
     } else {
-        return indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1];
+        return NO;
     }
 }
 
@@ -281,11 +316,14 @@
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:moveGroupAtIndex:toIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self moveGroupAtIndex:sourceGroupIndex toIndex:destinationGroupIndex];
     }
+}
+
+-(void)tableView:(UITableView *)tableView willBeginReorderingRowAtIndexPath:(NSIndexPath *)indexPath {
     // Collapse the group for now
     // TODO: if expanded, move the child table with it
-    if ([[expandedGroups objectAtIndex:sourceGroupIndex] boolValue]) {
-        [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:sourceIndexPath.row inSection:0]];
-        [self reloadSections:[NSIndexSet indexSetWithIndex:sourceIndexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+    if ([[expandedGroups objectAtIndex:indexPath.row] boolValue]) {
+        [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:[self groupIndexForRow:indexPath.row] inSection:0]];
+        [self reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 }
 
@@ -337,10 +375,10 @@
 }
 
 - (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canDeleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
-    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableViewChildTableView:canDeleteChildAtIndex:groupIndex:)]) {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteChildAtIndex:groupIndex:)]) {
         return [self.expandableTableViewDelegate expandableTableView:self canDeleteChildAtIndex:childIndex groupIndex:groupIndex];
     } else {
-        return YES;
+        return NO;
     }
 }
 
@@ -357,10 +395,10 @@
 }
 
 - (BOOL)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
-    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableViewChildTableView:canMoveChildAtIndex:groupIndex:)]) {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canMoveChildAtIndex:groupIndex:)]) {
         return [self.expandableTableViewDelegate expandableTableView:self canMoveChildAtIndex:childIndex groupIndex:groupIndex];
     } else {
-        return YES;
+        return NO;
     }
 }
 

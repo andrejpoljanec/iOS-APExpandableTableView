@@ -17,7 +17,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+        
     self.expandableTableView.expandableTableViewDelegate = self;
+        
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    [self.expandableTableView setEditing:editing animated:animated];
 }
 
 - (NSInteger)expandableTableView:(APExpandableTableView *)tableView numberOfChildrenForGroupAtIndex:(NSInteger)groupIndex {
@@ -37,7 +45,7 @@
     }
     
     cell.textLabel.text = [NSString stringWithFormat:@"Child cell #%ld", childIndex];
-    
+        
     return cell;
 }
 
@@ -54,5 +62,21 @@
     return cell;
 }
 
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    return YES;
+}
+
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canDeleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    return YES;
+}
+
+- (BOOL)expandableTableView:(APExpandableTableView *)tableView canMoveGroupAtIndex:(NSInteger)groupIndex {
+    return YES;
+}
+
+- (IBAction)editAction:(id)sender {
+    [self setEditing:!self.isEditing animated:YES];
+    self.editButton.title = self.isEditing ? @"Done" : @"Edit";
+}
 
 @end

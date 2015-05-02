@@ -12,6 +12,8 @@
 @interface ViewController : UIViewController <APExpandableTableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet APExpandableTableView *expandableTableView;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *editButton;
+- (IBAction)editAction:(id)sender;
 
 @end
 

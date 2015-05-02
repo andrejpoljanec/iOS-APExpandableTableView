@@ -97,7 +97,7 @@
     if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:canDeleteChildAtIndex:groupIndex:)]) {
         return [self.delegate expandableTableViewChildTableView:self canDeleteChildAtIndex:indexPath.row groupIndex:self.groupIndex];
     } else {
-        return YES;
+        return NO;
     }
 }
 
@@ -105,7 +105,7 @@
     if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:canMoveChildAtIndex:groupIndex:)]) {
         return [self.delegate expandableTableViewChildTableView:self canMoveChildAtIndex:indexPath.row groupIndex:self.groupIndex];
     } else {
-        return YES;
+        return NO;
     }
 }
 
