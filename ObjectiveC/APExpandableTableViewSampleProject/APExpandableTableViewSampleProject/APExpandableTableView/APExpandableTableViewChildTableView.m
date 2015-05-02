@@ -1,5 +1,5 @@
 //
-//  APExpandableTableViewChildCell.m
+//  APExpandableTableViewChildTableView.m
 //  APExpandableTableViewSampleProject
 //
 //  Created by Andrej Poljanec on 5/1/15.
@@ -7,6 +7,7 @@
 //
 
 #import "APExpandableTableViewChildTableView.h"
+#import "APExpandableTableViewConstants.h"
 
 @implementation APExpandableTableViewChildTableView
 
@@ -14,23 +15,27 @@
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        self.tableView = [[UITableView alloc] init];
-//        self.tableView.backgroundColor = COLOR_TRANSPARENT;
-//        self.backgroundColor = COLOR_TRANSPARENT;
-        self.tableView.dataSource = self;
-        self.tableView.delegate = self;
+        
+        self.backgroundColor = [UIColor clearColor];
         [self setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
         [[self contentView] setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+        
+        self.tableView = [[UITableView alloc] init];
+        self.tableView.backgroundColor = [UIColor clearColor];
+        self.tableView.dataSource = self;
+        self.tableView.delegate = self;
         [self.tableView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-        self.tableView.frame = CGRectMake(INSET_CHILD_TABLE, 0, self.contentView.frame.size.width - INSET_CHILD_TABLE, self.contentView.frame.size.height);
         self.tableView.scrollEnabled = NO;
         [self.contentView addSubview:self.tableView];
+        
     }
+    
     return self;
 }
 
 - (void)layoutSubviews {
     [super layoutSubviews];
+    
     self.tableView.frame = CGRectMake(INSET_CHILD_TABLE, 0, self.contentView.frame.size.width - INSET_CHILD_TABLE, [self tableView:self.tableView heightForRowAtIndexPath:nil] * [self.delegate expandableTableViewChildTableView:self numberOfChildrenForGroupAtIndex:self.groupIndex]);
 }
 
@@ -61,7 +66,7 @@
     UITableViewCell *cell = [self.delegate expandableTableViewChildTableView:self cellForChildAtIndex:indexPath.row groupIndex:self.groupIndex];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     self.backgroundColor = cell.backgroundColor;
-//    cell.backgroundColor = COLOR_TRANSPARENT;
+    cell.backgroundColor = [UIColor clearColor];
     if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:childAccessoryViewForChildIndex:groupIndex:)]) {
         cell.accessoryView = [self.delegate expandableTableViewChildTableView:self childAccessoryViewForChildIndex:indexPath.row groupIndex:self.groupIndex];
     }
@@ -88,16 +93,17 @@
     }
 }
 
+// TODO
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // TODO
     return YES;
 }
 
+// TODO
 -(BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // TODO
     return YES;
 }
 
+// TODO
 -(NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
     return proposedDestinationIndexPath;
 }
@@ -109,6 +115,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    // TODO
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:deleteChildAtIndex:groupIndex:)]) {
         [self.delegate expandableTableViewChildTableView:self deleteChildAtIndex:indexPath.row groupIndex:self.groupIndex];
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];

@@ -49,6 +49,7 @@
 		B4C67F631AF46C8600699CB5 /* APExpandableTableViewChildTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APExpandableTableViewChildTableView.m; path = APExpandableTableView/APExpandableTableViewChildTableView.m; sourceTree = "<group>"; };
 		B4C67F651AF46C9700699CB5 /* APExpandableTableViewGroupCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APExpandableTableViewGroupCell.h; path = APExpandableTableView/APExpandableTableViewGroupCell.h; sourceTree = "<group>"; };
 		B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APExpandableTableViewGroupCell.m; path = APExpandableTableView/APExpandableTableViewGroupCell.m; sourceTree = "<group>"; };
+		B4C67F681AF4A75800699CB5 /* APExpandableTableViewConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APExpandableTableViewConstants.h; path = APExpandableTableView/APExpandableTableViewConstants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +139,7 @@
 				B4C67F631AF46C8600699CB5 /* APExpandableTableViewChildTableView.m */,
 				B4C67F651AF46C9700699CB5 /* APExpandableTableViewGroupCell.h */,
 				B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */,
+				B4C67F681AF4A75800699CB5 /* APExpandableTableViewConstants.h */,
 			);
 			name = APExpandableTableView;
 			sourceTree = "<group>";

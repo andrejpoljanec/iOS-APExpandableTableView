@@ -6,6 +6,15 @@
 //  Copyright (c) 2015 Andrej Poljanec. All rights reserved.
 //
 
+/*
+ To convert a normal table into an exandable table, there are multiple solutions. The idea in this implementation is to have two types of cells, 
+ group cells and child cells. Group cells are normal cells just like in any other table. Child cells are each actually a complete table within 
+ which we define the real child cells. So child cells are actually another UITableView inside a UITableViewCell. The expandable table view then 
+ functions in a way that when a group cell is clicked, a table is inserted as a child cell. When a group cell is clicked again, the child table 
+ is removed to make the group collapse. The idea has its pros and cons, but I like it because it groups up the child cells together and keeps 
+ them separate from group cells. Reordering also makes much more sense in this way.
+ */
+
 #import <UIKit/UIKit.h>
 #import "APExpandableTableViewChildTableView.h"
 #import "APExpandableTableViewGroupCell.h"
@@ -16,30 +25,55 @@
 
 @property(nonatomic,strong) id<APExpandableTableViewDelegate> expandableTableViewDelegate;
 
+// Returns group index for row. For example if the row is actually the one of the children in the group, the returned number will be the group within
+// which that child resides. If it's called with a group, the same index is returned.
 - (NSUInteger)groupIndexForRow:(NSUInteger)row;
+
+
+// Each child table can be reloaded separately
 - (void)reloadChildAtGroupIndex:(NSInteger)groupIndex animate:(BOOL)animate;
-- (void)collapseAllGroups;
+// Or the whole table can be reloaded
 - (void)reloadData;
+
+// Collapse all groups
+- (void)collapseAllGroups;
 
 @end
 
 @protocol APExpandableTableViewDelegate <NSObject>
 
 @optional
-- (void)expandableTableView:(APExpandableTableView *)tableView didSelectChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
-- (void)expandableTableView:(APExpandableTableView *)tableView moveGroupAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex;
-- (void)expandableTableView:(APExpandableTableView *)tableView deleteGroupAtIndex:(NSInteger)groupIndex;
-- (void)expandableTableView:(APExpandableTableView *)tableView moveChildAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex groupIndex:(NSInteger)groupIndex;
-- (void)expandableTableView:(APExpandableTableView *)tableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
-- (CGFloat)heightForChildCellInExpandableTableView:(APExpandableTableView *)tableView;
-- (BOOL)indicatorOnLeftInExpandableTableView:(APExpandableTableView *)tableView;
+
+// All groups by default are expandable. To make it non expandable, implement this method.
 - (BOOL)expandableTableView:(APExpandableTableView *)tableView isGroupExpandableAtIndex:(NSInteger)groupIndex;
+
+// Reacting to cell clicks. Group can only react if it's non expandable.
+- (void)expandableTableView:(APExpandableTableView *)tableView didSelectChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (void)expandableTableView:(APExpandableTableView *)tableView didSelectGroupAtIndex:(NSInteger)groupIndex;
+
+// Moving cells
+- (void)expandableTableView:(APExpandableTableView *)tableView moveGroupAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex;
+- (void)expandableTableView:(APExpandableTableView *)tableView moveChildAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex groupIndex:(NSInteger)groupIndex;
+
+// Deleting cells
+- (void)expandableTableView:(APExpandableTableView *)tableView deleteGroupAtIndex:(NSInteger)groupIndex;
+- (void)expandableTableView:(APExpandableTableView *)tableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
+
+// Visual stuff
+
+// Child cell height
+- (CGFloat)heightForChildCellInExpandableTableView:(APExpandableTableView *)tableView;
+// Indicator position
+- (BOOL)indicatorOnLeftInExpandableTableView:(APExpandableTableView *)tableView;
+// Indicator icon
 - (UIImage *)expandIndicatorForExpandableTableView:(APExpandableTableView *)tableView;
+// Accessory views
 - (UIView *)expandableTableView:(APExpandableTableView *)tableView groupAccessoryViewForGroupIndex:(NSInteger)groupIndex;
 - (UIView *)expandableTableView:(APExpandableTableView *)tableView childAccessoryViewForChildIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 
 @required
+
+// Similar to UITableViewDataSource, separately for group and child cells
 - (NSInteger)numberOfGroupsInExpandableTableView:(APExpandableTableView *)tableView;
 - (UITableViewCell *)expandableTableView:(APExpandableTableView *)tableView cellForGroupAtIndex:(NSInteger)groupIndex;
 - (NSInteger)expandableTableView:(APExpandableTableView *)tableView numberOfChildrenForGroupAtIndex:(NSInteger)groupIndex;

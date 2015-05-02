@@ -7,6 +7,7 @@
 //
 
 #import "APExpandableTableView.h"
+#import "APExpandableTableViewConstants.h"
 
 @implementation APExpandableTableView {
     NSMutableArray *expandedGroups;
@@ -29,18 +30,25 @@
 }
 
 - (void)initialize {
+    // Set UITableView callbacks
     [self setDataSource:self];
     [self setDelegate:self];
+    
+    // Add separators to the table
     self.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    
+    // Add a footer view so that the visual part of the table ends with the last cell
     UIView *footer = [[UIView alloc] initWithFrame:CGRectZero];
     self.tableFooterView = footer;
 }
 
+// Setter for the delegate. When we have the delegate, we can initialize the expansion states.
 - (void)setExpandableTableViewDelegate:(id<APExpandableTableViewDelegate>)expandableTableViewDelegate {
     _expandableTableViewDelegate = expandableTableViewDelegate;
     [self initExpansionStates];
 }
 
+// Set all the expansion states to collapsed.
 - (void)initExpansionStates
 {
     NSInteger groupCount = [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self];
@@ -50,26 +58,74 @@
     }
 }
 
+// Collapses or expands a single group at specified indexPath. indexPath can be one of the child, it will recalculate to get the group index.
 - (void)toggleGroupAtIndexPath:(NSIndexPath *)indexPath {
+    
     [self beginUpdates];
+    
+    // Make sure we have the index of the group, not of the child
     NSInteger groupIndex = [self groupIndexForRow:indexPath.row];
+    
+    // Check if the cell is expanded or collapsed
     BOOL expanded = [[expandedGroups objectAtIndex:groupIndex] boolValue];
+    
+    // Collapse or expand as necessary
     [expandedGroups replaceObjectAtIndex:groupIndex withObject:[NSNumber numberWithBool:!expanded]];
+    
+    // Get the index path of the child table, so the next cell after the group cell
     NSIndexPath *nextIndexPath = [NSIndexPath indexPathForRow:(indexPath.row + 1) inSection:0];
+    
     if (expanded) {
+        // If it's expanded, we remove the child table
         [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:nextIndexPath] withRowAnimation:UITableViewRowAnimationFade];
     } else {
+        // If it's collapsed, we insert the child table
         [self insertRowsAtIndexPaths:[NSArray arrayWithObject:nextIndexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
-    [self deselectRowAtIndexPath:indexPath animated:NO];
+    
     [self endUpdates];
+    
+    // Visual change on the group cell. Update the indicator to show that the group is expanded.
     APExpandableTableViewGroupCell *groupCell = (APExpandableTableViewGroupCell *)[self cellForRowAtIndexPath:indexPath];
     [groupCell updateIndicatorToExpanded:[[expandedGroups objectAtIndex:[groupCell groupIndex]] boolValue] animate:YES];
-    if (!expanded) {
-        [self scrollToRowAtIndexPath:nextIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+// Collapses all groups
+-(void)collapseAllGroups {
+    for (int i = 0; i < expandedGroups.count; i++) {
+        if ([[expandedGroups objectAtIndex:i] boolValue]) {
+            [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+        }
     }
 }
 
+// Reload data, together with adjusting the expanded groups set
+-(void)reloadData {
+    NSInteger groupCount = [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self];
+    NSInteger currentIndex = expandedGroups.count - 1;
+    while (groupCount > expandedGroups.count) {
+        currentIndex++;
+        [expandedGroups addObject:[NSNumber numberWithBool:NO]];
+    }
+    while (groupCount < expandedGroups.count) {
+        [expandedGroups removeObjectAtIndex:expandedGroups.count - 1];
+    }
+    [super reloadData];
+}
+
+// Reload a child table
+-(void)reloadChildAtGroupIndex:(NSInteger)groupIndex animate:(BOOL)animate {
+    NSInteger index = [self rowForGroupIndex:groupIndex] + 1;
+    APExpandableTableViewChildTableView *cell = (APExpandableTableViewChildTableView *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+    [cell reloadDataWithAnimation:animate];
+    [self reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+}
+
+
+#pragma mark - helper methods
+
+// Convert group index to the row that a group is in.
+// For example if we have 3 groups and 0 is expanded, then group 2 is in row 3. If none are expanded, then group 2 is in row 2.
 - (NSUInteger)rowForGroupIndex:(NSUInteger)groupIndex {
     NSUInteger row = 0;
     NSUInteger index = 0;
@@ -82,10 +138,11 @@
         index++;
         row++;
     }
-    NSLog(@"Group %lu, Row %lu", (unsigned long)groupIndex, (unsigned long)row);
     return row;
 }
 
+// Find the corresponding group index for a row.
+// For example if we have 3 groups and 0 is expanded, then row 2 is group 1 (row 1 is the child table). If none are expanded, then row 2 is group 2.
 - (NSUInteger)groupIndexForRow:(NSUInteger)row {
     NSUInteger groupIndex = -1;
     NSUInteger index = 0;
@@ -100,6 +157,7 @@
     return groupIndex;
 }
 
+// Check if the row contains a group cell or a child table.
 - (BOOL)isChildCell:(NSUInteger)row {
     if (row == 0) {
         return NO;
@@ -112,11 +170,13 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
+    // For now we only have 1 section. Can be expanded to more if needed.
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    // Count the groups that are expanded and combine them to get the number of all rows
     NSInteger groupCount = [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self];
     NSCountedSet *countedSet = [[NSCountedSet alloc] initWithArray:expandedGroups];
     NSUInteger expandedGroupCount = [countedSet countForObject:[NSNumber numberWithBool:YES]];
@@ -126,36 +186,53 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
     NSUInteger groupIndex = [self groupIndexForRow:indexPath.row];
+    
     if ([self isChildCell:indexPath.row]) {
+        
+        // Set up child cell
+        
         NSString *childCellID = @"ChildCell";
         APExpandableTableViewChildTableView *cell = (APExpandableTableViewChildTableView *)[self dequeueReusableCellWithIdentifier:childCellID];
         if (cell == nil) {
             cell = [[APExpandableTableViewChildTableView alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:childCellID];
         }
+        
         [cell setGroupIndex:groupIndex];
         [cell setDelegate:self];
         [cell reloadDataWithAnimation:NO];
+        
         return cell;
+        
     } else {
+        
+        // Set up group cell
+        // Group cell consists of an expand indicator and the cell provided by the delegate, which here is called innerCell
+        
         NSString *groupCellID = @"GroupCell";
         UITableViewCell *innerCell;
         APExpandableTableViewGroupCell *cell = (APExpandableTableViewGroupCell *)[self dequeueReusableCellWithIdentifier:groupCellID];
         if (cell == nil) {
             cell = [[APExpandableTableViewGroupCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:groupCellID];
         }
+        
+        // Attach the inner cell
         innerCell = [self.expandableTableViewDelegate expandableTableView:self cellForGroupAtIndex:indexPath.row];
         [cell setGroupIndex:groupIndex];
         [cell attachInnerCell:innerCell];
+        
+        // Expand state
         BOOL expanded = [[expandedGroups objectAtIndex:groupIndex] boolValue];
         [cell updateIndicatorToExpanded:expanded animate:NO];
-        cell.backgroundColor = innerCell.backgroundColor;
-        if ([self.expandableTableViewDelegate respondsToSelector:@selector(indicatorOnLeftInExpandableTableView:)]) {
-            cell.indicatorOnLeft = [self.expandableTableViewDelegate indicatorOnLeftInExpandableTableView:self];
-        }
         if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:isGroupExpandableAtIndex:)]) {
             cell.expandable = [self.expandableTableViewDelegate expandableTableView:self isGroupExpandableAtIndex:groupIndex];
+        }
+        
+        // Visual design of the cell
+        cell.backgroundColor = innerCell.backgroundColor;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        if ([self.expandableTableViewDelegate respondsToSelector:@selector(indicatorOnLeftInExpandableTableView:)]) {
+            cell.indicatorOnLeft = [self.expandableTableViewDelegate indicatorOnLeftInExpandableTableView:self];
         }
         if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandIndicatorForExpandableTableView:)]) {
             cell.indicator.image = [self.expandableTableViewDelegate expandIndicatorForExpandableTableView:self];
@@ -163,7 +240,6 @@
         if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:groupAccessoryViewForGroupIndex:)]) {
             cell.accessoryView = [self.expandableTableViewDelegate expandableTableView:self groupAccessoryViewForGroupIndex:groupIndex];
         }
-        
         
         return cell;
     }
@@ -176,11 +252,13 @@
 
 // TODO
 -(BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    // Can only move a group in the outer table
+    return indexPath.row == 0 || [self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1];
 }
 
 -(NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
     if (proposedDestinationIndexPath.row == 0 || [self groupIndexForRow:proposedDestinationIndexPath.row - 1] != [self groupIndexForRow:proposedDestinationIndexPath.row]) {
+        // Can only move to a position of a group cell in the outer table
         return proposedDestinationIndexPath;
     } else {
         return sourceIndexPath;
@@ -190,51 +268,28 @@
 -(void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     APExpandableTableViewGroupCell *sourceCell = (APExpandableTableViewGroupCell *)[self cellForRowAtIndexPath:sourceIndexPath];
     APExpandableTableViewGroupCell *destinationCell = (APExpandableTableViewGroupCell *)[self cellForRowAtIndexPath:destinationIndexPath];
-    NSUInteger groupIndex = sourceCell.groupIndex;
+    NSUInteger sourceGroupIndex = sourceCell.groupIndex;
     NSUInteger destinationGroupIndex = destinationCell.groupIndex;
     sourceCell.groupIndex = destinationGroupIndex;
-    destinationCell.groupIndex = groupIndex;
-    [self.expandableTableViewDelegate expandableTableView:self moveGroupAtIndex:groupIndex toIndex:destinationGroupIndex];
-    if ([[expandedGroups objectAtIndex:groupIndex] boolValue]) {
+    destinationCell.groupIndex = sourceGroupIndex;
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:moveGroupAtIndex:toIndex:)]) {
+        [self.expandableTableViewDelegate expandableTableView:self moveGroupAtIndex:sourceGroupIndex toIndex:destinationGroupIndex];
+    }
+    // Collapse the group for now
+    // TODO: if expanded, move the child table with it
+    if ([[expandedGroups objectAtIndex:sourceGroupIndex] boolValue]) {
         [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:sourceIndexPath.row inSection:0]];
         [self reloadSections:[NSIndexSet indexSetWithIndex:sourceIndexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    // TODO: handle other editing styles
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:deleteGroupAtIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self deleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
         [self reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         [expandedGroups removeObjectAtIndex:indexPath.row];
     }
-}
-
--(void)collapseAllGroups {
-    for (int i = 0; i < expandedGroups.count; i++) {
-        if ([[expandedGroups objectAtIndex:i] boolValue]) {
-            [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
-        }
-    }
-}
-
--(void)reloadData {
-    NSInteger groupCount = [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self];
-    NSInteger currentIndex = expandedGroups.count - 1;
-    while (groupCount > expandedGroups.count) {
-        currentIndex++;
-        [expandedGroups addObject:[NSNumber numberWithBool:NO]];
-    }
-    while (groupCount < expandedGroups.count) {
-        [expandedGroups removeObjectAtIndex:expandedGroups.count - 1];
-    }
-    [super reloadData];
-}
-
--(void)reloadChildAtGroupIndex:(NSInteger)groupIndex animate:(BOOL)animate {
-    NSInteger index = [self rowForGroupIndex:groupIndex] + 1;
-    APExpandableTableViewChildTableView *cell = (APExpandableTableViewChildTableView *)[self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-    [cell reloadDataWithAnimation:animate];
-    [self reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 #pragma mark - UITableViewDelegate
@@ -256,6 +311,7 @@
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if ([cell isKindOfClass:[APExpandableTableViewGroupCell class]]) {
         if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:isGroupExpandableAtIndex:)] && ![self.expandableTableViewDelegate expandableTableView:self isGroupExpandableAtIndex:groupIndex]) {
+            // If it's not expandable, we can react to a click in a different way than toggling
             if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:didSelectGroupAtIndex:)]) {
                 [self.expandableTableViewDelegate expandableTableView:self didSelectGroupAtIndex:groupIndex];
             }

@@ -8,20 +8,21 @@
 
 #import <UIKit/UIKit.h>
 
-#define INDICATOR_WIDTH 40
-#define INSET_INNER_CELL 15
-#define DEFAULT_GROUP_CELL_HEIGHT 50
-
 @interface APExpandableTableViewGroupCell : UITableViewCell
 
-@property (nonatomic,strong) UIImageView *indicator;
 @property (nonatomic,strong) UITableViewCell *cell;
 @property (nonatomic) NSInteger groupIndex;
+// Expansion properties
 @property (nonatomic) BOOL expanded;
-@property (nonatomic) BOOL indicatorOnLeft;
 @property (nonatomic) BOOL expandable;
+// Visual
+@property (nonatomic) BOOL indicatorOnLeft;
+@property (nonatomic,strong) UIImageView *indicator;
 
+// Animate the indicator to expanded
 - (void)updateIndicatorToExpanded:(BOOL)expanded animate:(BOOL)animate;
+
+// Attach the delegate cell to the group cell
 - (void)attachInnerCell:(UITableViewCell *)innerCell;
 
 @end
