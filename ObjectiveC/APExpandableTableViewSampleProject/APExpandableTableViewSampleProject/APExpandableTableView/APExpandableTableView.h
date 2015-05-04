@@ -7,7 +7,7 @@
 //
 
 /*
- To convert a normal table into an exandable table, there are multiple solutions. The idea in this implementation is to have two types of cells, 
+ To convert a normal table into an expandable table, there are multiple solutions. The idea in this implementation is to have two types of cells, 
  group cells and child cells. Group cells are normal cells just like in any other table. Child cells are each actually a complete table within 
  which we define the real child cells. So child cells are actually another UITableView inside a UITableViewCell. The expandable table view then 
  functions in a way that when a group cell is clicked, a table is inserted as a child cell. When a group cell is clicked again, the child table 
