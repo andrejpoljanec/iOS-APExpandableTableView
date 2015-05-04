@@ -24,7 +24,7 @@
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bxb-5Y-7MC">
                                 <rect key="frame" x="0.0" y="20" width="600" height="44"/>
                                 <items>
-                                    <navigationItem title="Expandable Tample Sample" id="TrR-nT-Efb">
+                                    <navigationItem title="Expandable Table Sample" id="TrR-nT-Efb">
                                         <barButtonItem key="rightBarButtonItem" title="Edit" id="Z1Z-5R-SIz">
                                             <connections>
                                                 <action selector="editAction:" destination="BYZ-38-t0r" id="eB1-uH-tz2"/>
