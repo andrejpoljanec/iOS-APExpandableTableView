@@ -21,7 +21,7 @@
 
 @protocol APExpandableTableViewDelegate;
 
-@interface APExpandableTableView : UITableView <UITableViewDataSource, UITableViewDelegate, APExpandableTableViewChildTableViewDelegate>
+@interface APExpandableTableView : UITableView <UITableViewDataSource, UITableViewDelegate, UIGestureRecognizerDelegate, APExpandableTableViewChildTableViewDelegate>
 
 @property(nonatomic,strong) id<APExpandableTableViewDelegate> expandableTableViewDelegate;
 

@@ -8,6 +8,7 @@
 
 #import "APExpandableTableView.h"
 #import "APExpandableTableViewConstants.h"
+#import "APDragGestureRecognizer.h"
 
 @implementation APExpandableTableView {
     NSMutableArray *expandedGroups;
@@ -241,6 +242,8 @@
             cell.accessoryView = [self.expandableTableViewDelegate expandableTableView:self groupAccessoryViewForGroupIndex:groupIndex];
         }
         
+        cell.tag = groupIndex;
+        
         return cell;
     }
 }
@@ -433,6 +436,59 @@
     } else {
         return nil;
     }
+}
+
+#pragma mark - Reordering
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    if (editing) {
+        for (int i = 0; i < [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self]; i++) {
+            UIView *reorderView = [self findReorderControlForView:self groupIndex:i];
+            if (reorderView) {
+                reorderView.userInteractionEnabled = NO;
+                UIView *fakeView = [[UIView alloc] initWithFrame:reorderView.frame];
+                UIGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(reorderControlClicked:)];
+                gestureRecognizer.delegate = self;
+                fakeView.tag = i;
+                [fakeView addGestureRecognizer:gestureRecognizer];
+                [reorderView.superview addSubview:fakeView];
+            }
+        }
+    }
+}
+
+- (UIView *)findReorderControlForView:(UIView *)view groupIndex:(NSInteger)groupIndex{
+    if ([NSStringFromClass([view class]) rangeOfString:@"Reorder"].location != NSNotFound) {
+        return view;
+    }
+    if ([view isKindOfClass:[APExpandableTableViewGroupCell class]] && view.tag != groupIndex) {
+        return nil;
+    }
+    for (UIView *subview in view.subviews) {
+        UIView *foundView = [self findReorderControlForView:subview groupIndex:groupIndex];
+        if (foundView) {
+            return foundView;
+        }
+    }
+    return nil;
+}
+
+- (void)reorderControlClicked:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+        NSLog(@"%lu drop", gestureRecognizer.view.tag);
+    } else {
+        NSLog(@"%lu drag", gestureRecognizer.view.tag);
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    UIView *view = gestureRecognizer.view;
+    if ([view isKindOfClass:[APExpandableTableView class]]) {
+        return NO;
+    }
+    NSLog(@"%lu start drag", gestureRecognizer.view.tag);
+    return YES;
 }
 
 @end

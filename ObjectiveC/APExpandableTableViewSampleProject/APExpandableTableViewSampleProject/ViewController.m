@@ -33,7 +33,7 @@
 }
 
 - (NSInteger)numberOfGroupsInExpandableTableView:(APExpandableTableView *)tableView {
-    return 2;
+    return 3;
 }
 
 - (UITableViewCell *)expandableTableView:(APExpandableTableView *)tableView cellForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
