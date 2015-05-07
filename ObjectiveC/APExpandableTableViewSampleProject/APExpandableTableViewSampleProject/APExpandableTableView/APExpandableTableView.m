@@ -338,13 +338,24 @@
 #pragma mark - UITableViewDelegate
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger groupIndex = [self groupIndexForRow:indexPath.row];
     BOOL childCell = [self isChildCell:indexPath.row];
     if (childCell) {
-        NSInteger groupIndex = [self groupIndexForRow:indexPath.row];
         NSInteger childCount = [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:groupIndex];
-        return [self heightForExpandableTableViewChildCell] * childCount;
+        CGFloat height = 0;
+        for (int i = 0; i < childCount; i++) {
+            if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:heightForChildAtIndex:groupIndex:)]) {
+                height += [self.expandableTableViewDelegate expandableTableView:self heightForChildAtIndex:i groupIndex:groupIndex];
+            } else {
+                height += DEFAULT_CHILD_CELL_HEIGHT;
+            }        }
+        return height;
     } else {
-        return DEFAULT_GROUP_CELL_HEIGHT;
+        if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:heightForGroupAtIndex:)]) {
+            return [self.expandableTableViewDelegate expandableTableView:self heightForGroupAtIndex:groupIndex];
+        } else {
+            return DEFAULT_GROUP_CELL_HEIGHT;
+        }
     }
 }
 
@@ -408,9 +419,9 @@
     }
 }
 
-- (CGFloat)heightForExpandableTableViewChildCell {
-    if ([self.expandableTableViewDelegate respondsToSelector:@selector(heightForChildCellInExpandableTableView:)]) {
-        return [self.expandableTableViewDelegate heightForChildCellInExpandableTableView:self];
+- (CGFloat)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView heightForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:heightForChildAtIndex:groupIndex:)]) {
+        return [self.expandableTableViewDelegate expandableTableView:self heightForChildAtIndex:childIndex groupIndex:groupIndex];
     } else {
         return DEFAULT_CHILD_CELL_HEIGHT;
     }

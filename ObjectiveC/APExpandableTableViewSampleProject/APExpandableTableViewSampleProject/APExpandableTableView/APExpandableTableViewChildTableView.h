@@ -35,7 +35,7 @@
 - (void)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 
 // Visual
-- (CGFloat)heightForExpandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView;
+- (CGFloat)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView heightForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 - (UIView *)expandableTableViewChildTableView:(APExpandableTableViewChildTableView *)expandableTableViewChildTableView childAccessoryViewForChildIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
 
 @required

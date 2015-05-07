@@ -65,8 +65,9 @@
 
 // Visual stuff
 
-// Child cell height
-- (CGFloat)heightForChildCellInExpandableTableView:(APExpandableTableView *)tableView;
+// Cell heights
+- (CGFloat)expandableTableView:(APExpandableTableView *)tableView heightForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex;
+- (CGFloat)expandableTableView:(APExpandableTableView *)tableView heightForGroupAtIndex:(NSInteger)groupIndex;
 // Indicator position
 - (BOOL)indicatorOnLeftInExpandableTableView:(APExpandableTableView *)tableView;
 // Indicator icon

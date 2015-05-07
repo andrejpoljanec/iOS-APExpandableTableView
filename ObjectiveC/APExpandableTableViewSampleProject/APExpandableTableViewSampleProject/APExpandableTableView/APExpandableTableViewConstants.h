@@ -10,8 +10,8 @@
 
 // Some default values
 #define DEFAULT_PADDING 8
-#define DEFAULT_GROUP_CELL_HEIGHT 50
-#define DEFAULT_CHILD_CELL_HEIGHT 50
+#define DEFAULT_GROUP_CELL_HEIGHT 44
+#define DEFAULT_CHILD_CELL_HEIGHT 44
 
 // Width of the indicator image
 #define INDICATOR_WIDTH 40

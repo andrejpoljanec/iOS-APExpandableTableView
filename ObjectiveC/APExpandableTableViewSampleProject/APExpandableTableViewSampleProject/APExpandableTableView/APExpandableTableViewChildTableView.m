@@ -74,8 +74,8 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self.delegate respondsToSelector:@selector(heightForExpandableTableViewChildTableView:)]) {
-        return [self.delegate heightForExpandableTableViewChildTableView:self];
+    if ([self.delegate respondsToSelector:@selector(expandableTableViewChildTableView:heightForChildAtIndex:groupIndex:)]) {
+        return [self.delegate expandableTableViewChildTableView:self heightForChildAtIndex:indexPath.row groupIndex:self.groupIndex];
     } else {
         return DEFAULT_CHILD_CELL_HEIGHT;
     }
