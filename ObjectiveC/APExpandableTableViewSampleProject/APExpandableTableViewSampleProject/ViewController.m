@@ -12,15 +12,24 @@
 
 @end
 
-@implementation ViewController
+@implementation ViewController {
+    NSMutableArray *data;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
-        
+    
+    data = [[NSMutableArray alloc] init];
+    NSMutableArray *group1 = [[NSMutableArray alloc] initWithObjects:@"Group 1", @"A", @"B", nil];
+    NSMutableArray *group2 = [[NSMutableArray alloc] initWithObjects:@"Group 2", @"C", @"D", nil];
+    NSMutableArray *group3 = [[NSMutableArray alloc] initWithObjects:@"Group 3", @"E", @"F", nil];
+    [data addObject:group1];
+    [data addObject:group2];
+    [data addObject:group3];
+    
     self.expandableTableView.expandableTableViewDelegate = self;
-        
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -29,11 +38,11 @@
 }
 
 - (NSInteger)expandableTableView:(APExpandableTableView *)tableView numberOfChildrenForGroupAtIndex:(NSInteger)groupIndex {
-    return 2;
+    return [[data objectAtIndex:groupIndex] count] - 1;
 }
 
 - (NSInteger)numberOfGroupsInExpandableTableView:(APExpandableTableView *)tableView {
-    return 3;
+    return [data count];
 }
 
 - (UITableViewCell *)expandableTableView:(APExpandableTableView *)tableView cellForChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
@@ -44,7 +53,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
     
-    cell.textLabel.text = [NSString stringWithFormat:@"Child cell #%ld", childIndex];
+    cell.textLabel.text = [[data objectAtIndex:groupIndex] objectAtIndex:childIndex + 1];
         
     return cell;
 }
@@ -57,9 +66,25 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
     
-    cell.textLabel.text = [NSString stringWithFormat:@"Parent cell #%ld", groupIndex];
+    cell.textLabel.text = [[data objectAtIndex:groupIndex] objectAtIndex:0];
     
     return cell;
+}
+
+- (void)expandableTableView:(APExpandableTableView *)tableView deleteChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {
+    [[data objectAtIndex:groupIndex] removeObjectAtIndex:childIndex + 1];
+}
+
+- (void)expandableTableView:(APExpandableTableView *)tableView moveChildAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex groupIndex:(NSInteger)groupIndex {
+    NSString *moveObject = [[data objectAtIndex:groupIndex] objectAtIndex:sourceIndex + 1];
+    [[data objectAtIndex:groupIndex] removeObjectAtIndex:sourceIndex + 1];
+    [[data objectAtIndex:groupIndex] insertObject:moveObject atIndex:destinationIndex + 1];
+}
+
+- (void)expandableTableView:(APExpandableTableView *)tableView moveGroupAtIndex:(NSInteger)sourceIndex toIndex:(NSInteger)destinationIndex {
+    NSMutableArray *moveObject = [data objectAtIndex:sourceIndex];
+    [data removeObjectAtIndex:sourceIndex];
+    [data insertObject:moveObject atIndex:destinationIndex];
 }
 
 - (BOOL)expandableTableView:(APExpandableTableView *)tableView canMoveChildAtIndex:(NSInteger)childIndex groupIndex:(NSInteger)groupIndex {

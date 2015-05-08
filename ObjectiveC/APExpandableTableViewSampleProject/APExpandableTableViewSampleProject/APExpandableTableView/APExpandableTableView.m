@@ -8,7 +8,6 @@
 
 #import "APExpandableTableView.h"
 #import "APExpandableTableViewConstants.h"
-#import "APDragGestureRecognizer.h"
 
 @implementation APExpandableTableView {
     NSMutableArray *expandedGroups;
@@ -41,6 +40,9 @@
     // Add a footer view so that the visual part of the table ends with the last cell
     UIView *footer = [[UIView alloc] initWithFrame:CGRectZero];
     self.tableFooterView = footer;
+    
+    // React to touches instantly
+    self.delaysContentTouches = NO;
 }
 
 // Setter for the delegate. When we have the delegate, we can initialize the expansion states.
@@ -251,20 +253,21 @@
 // Table can still edit the row if the child table is editable and group is not
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     BOOL canEdit = NO;
+    NSInteger groupIndex = [self groupIndexForRow:indexPath.row];
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteGroupAtIndex:)]) {
-        canEdit = [self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
+        canEdit = [self.expandableTableViewDelegate expandableTableView:self canDeleteGroupAtIndex:groupIndex];
     }
     if (!canEdit && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canMoveChildAtIndex:groupIndex:)]) {
-        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:indexPath.row]; i++) {
-            if ([self.expandableTableViewDelegate expandableTableView:self canMoveChildAtIndex:i groupIndex:indexPath.row]) {
+        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:groupIndex]; i++) {
+            if ([self.expandableTableViewDelegate expandableTableView:self canMoveChildAtIndex:i groupIndex:groupIndex]) {
                 canEdit = YES;
                 break;
             }
         }
     }
     if (!canEdit && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:canDeleteChildAtIndex:groupIndex:)]) {
-        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:indexPath.row]; i++) {
-            if ([self.expandableTableViewDelegate expandableTableView:self canDeleteChildAtIndex:i groupIndex:indexPath.row]) {
+        for (int i = 0; i < [self.expandableTableViewDelegate expandableTableView:self numberOfChildrenForGroupAtIndex:groupIndex]; i++) {
+            if ([self.expandableTableViewDelegate expandableTableView:self canDeleteChildAtIndex:i groupIndex:groupIndex]) {
                 canEdit = YES;
                 break;
             }
@@ -316,6 +319,10 @@
     NSUInteger destinationGroupIndex = destinationCell.groupIndex;
     sourceCell.groupIndex = destinationGroupIndex;
     destinationCell.groupIndex = sourceGroupIndex;
+    BOOL sourceExpanded = [expandedGroups objectAtIndex:sourceGroupIndex];
+    BOOL destinationExpanded = [expandedGroups objectAtIndex:destinationGroupIndex];
+    [expandedGroups replaceObjectAtIndex:sourceGroupIndex withObject:[NSNumber numberWithBool:destinationExpanded]];
+    [expandedGroups replaceObjectAtIndex:destinationGroupIndex withObject:[NSNumber numberWithBool:sourceExpanded]];
     if ([self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:moveGroupAtIndex:toIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self moveGroupAtIndex:sourceGroupIndex toIndex:destinationGroupIndex];
     }
@@ -324,10 +331,10 @@
 -(void)tableView:(UITableView *)tableView willBeginReorderingRowAtIndexPath:(NSIndexPath *)indexPath {
     // Collapse the group for now
     // TODO: if expanded, move the child table with it
-    if ([[expandedGroups objectAtIndex:indexPath.row] boolValue]) {
-        [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:[self groupIndexForRow:indexPath.row] inSection:0]];
-        [self reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
+//    if ([[expandedGroups objectAtIndex:indexPath.row] boolValue]) {
+//        [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:[self groupIndexForRow:indexPath.row] inSection:0]];
+//        [self reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
+//    }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -440,6 +447,12 @@
 
 #pragma mark - Reordering
 
+static UIView *snapshot = nil;
+static NSIndexPath *sourceIndexPath = nil;
+static CGFloat reorderX = 0;
+static CGFloat gripY = 0;
+static BOOL moveWithChild;
+
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     if (editing) {
@@ -447,12 +460,14 @@
             UIView *reorderView = [self findReorderControlForView:self groupIndex:i];
             if (reorderView) {
                 reorderView.userInteractionEnabled = NO;
+                reorderX = reorderView.frame.origin.x;
                 UIView *fakeView = [[UIView alloc] initWithFrame:reorderView.frame];
-                UIGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(reorderControlClicked:)];
+                UIGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(reorderControlPanned:)];
                 gestureRecognizer.delegate = self;
-                fakeView.tag = i;
                 [fakeView addGestureRecognizer:gestureRecognizer];
                 [reorderView.superview addSubview:fakeView];
+            } else {
+                NSLog(@"reorder not found %d", i);
             }
         }
     }
@@ -465,6 +480,9 @@
     if ([view isKindOfClass:[APExpandableTableViewGroupCell class]] && view.tag != groupIndex) {
         return nil;
     }
+    if ([view isKindOfClass:[APExpandableTableViewChildTableView class]]) {
+        return nil;
+    }
     for (UIView *subview in view.subviews) {
         UIView *foundView = [self findReorderControlForView:subview groupIndex:groupIndex];
         if (foundView) {
@@ -474,21 +492,142 @@
     return nil;
 }
 
-- (void)reorderControlClicked:(UIGestureRecognizer *)gestureRecognizer {
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        NSLog(@"%lu drop", gestureRecognizer.view.tag);
-    } else {
-        NSLog(@"%lu drag", gestureRecognizer.view.tag);
+- (void)reorderControlPanned:(UIGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:self];
+    NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
+    if (indexPath) {
+        switch (gestureRecognizer.state) {
+            case UIGestureRecognizerStateChanged: {
+                CGRect frame = snapshot.frame;
+                frame.origin.y = location.y - gripY;
+                snapshot.frame = frame;
+                
+                if (![indexPath isEqual:sourceIndexPath] && (indexPath.row == 0  || ([self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1]))) {
+                    NSIndexPath *destinationIndexPath = indexPath;
+                    BOOL destinationHasChild = [[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue];
+                    if (destinationHasChild && sourceIndexPath.row < indexPath.row) {
+                        destinationIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
+                    }
+                    NSInteger sourceGroupIndex = [self groupIndexForRow:sourceIndexPath.row];
+                    NSInteger destinationGroupIndex = [self groupIndexForRow:destinationIndexPath.row];
+                    BOOL sourceExpanded = [[expandedGroups objectAtIndex:sourceGroupIndex] boolValue];
+                    BOOL destinationExpanded = [[expandedGroups objectAtIndex:destinationGroupIndex] boolValue];
+                    [expandedGroups replaceObjectAtIndex:sourceGroupIndex withObject:[NSNumber numberWithBool:destinationExpanded]];
+                    [expandedGroups replaceObjectAtIndex:destinationGroupIndex withObject:[NSNumber numberWithBool:sourceExpanded]];
+                    [self moveRowAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+                    NSLog(@"moving group from %lu to %lu", sourceIndexPath.row, destinationIndexPath.row);
+//                    if (moveWithChild) {
+//                        NSIndexPath *sourceChildIndexPath = [NSIndexPath indexPathForRow:sourceIndexPath.row < indexPath.row ? (sourceIndexPath.row - 1) : sourceIndexPath.row inSection:0];
+//                        NSIndexPath *childIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
+//                        NSLog(@"moving child from %lu to %lu", sourceChildIndexPath.row, childIndexPath.row);
+//                        [self moveRowAtIndexPath:sourceChildIndexPath toIndexPath:childIndexPath];
+//                    }
+                    sourceIndexPath = destinationIndexPath;
+                }
+            }
+                break;
+            case UIGestureRecognizerStateEnded: {
+                NSIndexPath *destinationIndexPath = indexPath;
+                BOOL destinationHasChild = [[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue];
+                if (destinationHasChild) {
+                    destinationIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
+                }
+                UITableViewCell *cell = [self cellForRowAtIndexPath:destinationIndexPath];
+                cell.hidden = NO;
+                cell.alpha = 0.0;
+                [UIView animateWithDuration:0.1f
+                                 animations:^{
+                                     snapshot.center = cell.center;
+                                     snapshot.transform = CGAffineTransformIdentity;
+                                     snapshot.alpha = 0.0;
+                                     cell.alpha = 1.0;
+                                 }
+                                 completion:^(BOOL finished) {
+                                     sourceIndexPath = nil;
+                                     [snapshot removeFromSuperview];
+                                     snapshot = nil;
+                                 }];
+            }
+                break;
+            default:
+                break;
+        }
     }
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    UIView *view = gestureRecognizer.view;
-    if ([view isKindOfClass:[APExpandableTableView class]]) {
-        return NO;
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    CGPoint location = [[touches anyObject] locationInView:self];
+    if (![self isEditing] || location.x < reorderX) {
+        [super touchesBegan:touches withEvent:event];
+        return;
     }
-    NSLog(@"%lu start drag", gestureRecognizer.view.tag);
-    return YES;
+    NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
+    if (indexPath) {
+        UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+        
+        sourceIndexPath = indexPath;
+        snapshot = [self snapshotOfGroupCell:cell gorupIndex:[self groupIndexForRow:indexPath.row]];
+        
+        CGPoint origin = cell.frame.origin;
+        CGRect frame = snapshot.frame;
+        frame.origin = origin;
+        snapshot.frame = frame;
+        snapshot.alpha = 0.0;
+        [self addSubview:snapshot];
+        
+        gripY = location.y - origin.y;
+        
+        UITableViewCell *childCell = nil;
+        if ([[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue]) {
+            childCell = [self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0]];
+            moveWithChild = YES;
+        }
+        
+        [UIView animateWithDuration:0.1f
+                         animations:^{
+                             snapshot.transform = CGAffineTransformMakeScale(1.05, 1.05);
+                             snapshot.alpha = 0.98;
+                             cell.alpha = 0.0;
+                             if (childCell) {
+                                 childCell.alpha = 0.0;
+                             }
+                         }
+                         completion:^(BOOL finished) {
+                             cell.hidden = YES;
+                             if (childCell) {
+                                 childCell.hidden = YES;
+                             }
+                         }];
+
+    }
+}
+
+- (UIView *)snapshotOfGroupCell:(UITableViewCell *)cell gorupIndex:(NSInteger)groupIndex {
+    
+    UITableViewCell *childCell = nil;
+    CGFloat height = cell.frame.size.height;
+    if ([[expandedGroups objectAtIndex:groupIndex] boolValue]) {
+        childCell = [self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:([self rowForGroupIndex:groupIndex] + 1) inSection:0]];
+        height += childCell.frame.size.height;
+    }
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(cell.frame.size.width, height), NO, 0);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    [cell.layer renderInContext:context];
+    if (childCell) {
+        CGContextTranslateCTM(context, 0, cell.frame.size.height);
+        [childCell.layer renderInContext:context];        
+    }
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    UIView *snapshot = [[UIImageView alloc] initWithImage:image];
+    snapshot.layer.masksToBounds = NO;
+    snapshot.layer.cornerRadius = 0.0;
+    snapshot.layer.shadowOffset = CGSizeMake(-5.0, 0.0);
+    snapshot.layer.shadowRadius = 5.0;
+    snapshot.layer.shadowOpacity = 0.4;
+    
+    return snapshot;
 }
 
 @end

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B42AAC911AFB53370076EAD8 /* APDragGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B42AAC901AFB53370076EAD8 /* APDragGestureRecognizer.m */; };
 		B4C67F3B1AF46BCC00699CB5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F3A1AF46BCC00699CB5 /* main.m */; };
 		B4C67F3E1AF46BCC00699CB5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F3D1AF46BCC00699CB5 /* AppDelegate.m */; };
 		B4C67F411AF46BCC00699CB5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C67F401AF46BCC00699CB5 /* ViewController.m */; };
@@ -31,8 +30,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B42AAC8F1AFB53370076EAD8 /* APDragGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = APDragGestureRecognizer.h; path = APExpandableTableView/APDragGestureRecognizer.h; sourceTree = "<group>"; };
-		B42AAC901AFB53370076EAD8 /* APDragGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = APDragGestureRecognizer.m; path = APExpandableTableView/APDragGestureRecognizer.m; sourceTree = "<group>"; };
 		B4C67F351AF46BCC00699CB5 /* APExpandableTableViewSampleProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = APExpandableTableViewSampleProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4C67F391AF46BCC00699CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B4C67F3A1AF46BCC00699CB5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -143,8 +140,6 @@
 				B4C67F651AF46C9700699CB5 /* APExpandableTableViewGroupCell.h */,
 				B4C67F661AF46C9700699CB5 /* APExpandableTableViewGroupCell.m */,
 				B4C67F681AF4A75800699CB5 /* APExpandableTableViewConstants.h */,
-				B42AAC8F1AFB53370076EAD8 /* APDragGestureRecognizer.h */,
-				B42AAC901AFB53370076EAD8 /* APDragGestureRecognizer.m */,
 			);
 			name = APExpandableTableView;
 			sourceTree = "<group>";
@@ -249,7 +244,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B42AAC911AFB53370076EAD8 /* APDragGestureRecognizer.m in Sources */,
 				B4C67F671AF46C9700699CB5 /* APExpandableTableViewGroupCell.m in Sources */,
 				B4C67F641AF46C8600699CB5 /* APExpandableTableViewChildTableView.m in Sources */,
 				B4C67F411AF46BCC00699CB5 /* ViewController.m in Sources */,
