@@ -328,15 +328,6 @@
     }
 }
 
--(void)tableView:(UITableView *)tableView willBeginReorderingRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Collapse the group for now
-    // TODO: if expanded, move the child table with it
-//    if ([[expandedGroups objectAtIndex:indexPath.row] boolValue]) {
-//        [self toggleGroupAtIndexPath:[NSIndexPath indexPathForRow:[self groupIndexForRow:indexPath.row] inSection:0]];
-//        [self reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section] withRowAnimation:UITableViewRowAnimationAutomatic];
-//    }
-}
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:deleteGroupAtIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self deleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
@@ -447,42 +438,53 @@
 
 #pragma mark - Reordering
 
+// Snapshot of whatever we are dragging.
 static UIView *snapshot = nil;
+// Remember the current index path of whatever we are dragging.
 static NSIndexPath *sourceIndexPath = nil;
-static CGFloat reorderX = 0;
+// Vertical difference between the top of the cell and initial dragging position.
 static CGFloat gripY = 0;
-static BOOL moveWithChild;
+// Remember if we are also dragging a child table.
+static BOOL sourceHasChild;
+
+// x coordinate of a reorder view.
+static CGFloat reorderX = 0;
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     if (editing) {
+        // A bit hacky. Find the reorder view in the table, disable it, and add a placeholder view that will server as a handle with a gesture recognizer.
         for (int i = 0; i < [self.expandableTableViewDelegate numberOfGroupsInExpandableTableView:self]; i++) {
             UIView *reorderView = [self findReorderControlForView:self groupIndex:i];
             if (reorderView) {
                 reorderView.userInteractionEnabled = NO;
+                // Remember the x coordinate so that we can react to the touch.
                 reorderX = reorderView.frame.origin.x;
                 UIView *fakeView = [[UIView alloc] initWithFrame:reorderView.frame];
                 UIGestureRecognizer *gestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(reorderControlPanned:)];
                 gestureRecognizer.delegate = self;
                 [fakeView addGestureRecognizer:gestureRecognizer];
                 [reorderView.superview addSubview:fakeView];
-            } else {
-                NSLog(@"reorder not found %d", i);
             }
         }
     }
 }
 
+// Method to find the UITableViewCellReorderControl inside the given view in a cell with the groupIndex
 - (UIView *)findReorderControlForView:(UIView *)view groupIndex:(NSInteger)groupIndex{
+    // If found, return it.
     if ([NSStringFromClass([view class]) rangeOfString:@"Reorder"].location != NSNotFound) {
         return view;
     }
+    // Don't go inside the group cell with the wrong group index.
     if ([view isKindOfClass:[APExpandableTableViewGroupCell class]] && view.tag != groupIndex) {
         return nil;
     }
+    // Child table also give reorder views. We don't need those.
     if ([view isKindOfClass:[APExpandableTableViewChildTableView class]]) {
         return nil;
     }
+    // Now just go recursively through all the subviews.
     for (UIView *subview in view.subviews) {
         UIView *foundView = [self findReorderControlForView:subview groupIndex:groupIndex];
         if (foundView) {
@@ -492,117 +494,189 @@ static BOOL moveWithChild;
     return nil;
 }
 
+// React to the pan (drag).
 - (void)reorderControlPanned:(UIGestureRecognizer *)gestureRecognizer {
+    
     CGPoint location = [gestureRecognizer locationInView:self];
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
-    if (indexPath) {
+    
+    // Only drag if we know where we are coming from and where we are going.
+    if (indexPath && sourceIndexPath) {
+        
         switch (gestureRecognizer.state) {
-            case UIGestureRecognizerStateChanged: {
-                CGRect frame = snapshot.frame;
-                frame.origin.y = location.y - gripY;
-                snapshot.frame = frame;
                 
-                if (![indexPath isEqual:sourceIndexPath] && (indexPath.row == 0  || ([self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1]))) {
-                    NSIndexPath *destinationIndexPath = indexPath;
-                    BOOL destinationHasChild = [[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue];
-                    if (destinationHasChild && sourceIndexPath.row < indexPath.row) {
-                        destinationIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
-                    }
-                    NSInteger sourceGroupIndex = [self groupIndexForRow:sourceIndexPath.row];
-                    NSInteger destinationGroupIndex = [self groupIndexForRow:destinationIndexPath.row];
-                    BOOL sourceExpanded = [[expandedGroups objectAtIndex:sourceGroupIndex] boolValue];
-                    BOOL destinationExpanded = [[expandedGroups objectAtIndex:destinationGroupIndex] boolValue];
-                    [expandedGroups replaceObjectAtIndex:sourceGroupIndex withObject:[NSNumber numberWithBool:destinationExpanded]];
-                    [expandedGroups replaceObjectAtIndex:destinationGroupIndex withObject:[NSNumber numberWithBool:sourceExpanded]];
-                    [self moveRowAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
-                    NSLog(@"moving group from %lu to %lu", sourceIndexPath.row, destinationIndexPath.row);
-//                    if (moveWithChild) {
-//                        NSIndexPath *sourceChildIndexPath = [NSIndexPath indexPathForRow:sourceIndexPath.row < indexPath.row ? (sourceIndexPath.row - 1) : sourceIndexPath.row inSection:0];
-//                        NSIndexPath *childIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
-//                        NSLog(@"moving child from %lu to %lu", sourceChildIndexPath.row, childIndexPath.row);
-//                        [self moveRowAtIndexPath:sourceChildIndexPath toIndexPath:childIndexPath];
-//                    }
-                    sourceIndexPath = destinationIndexPath;
-                }
-            }
+            case UIGestureRecognizerStateChanged:
+                [self dragCellToIndexPath:indexPath toLocation:location];
                 break;
-            case UIGestureRecognizerStateEnded: {
-                NSIndexPath *destinationIndexPath = indexPath;
-                BOOL destinationHasChild = [[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue];
-                if (destinationHasChild) {
-                    destinationIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
-                }
-                UITableViewCell *cell = [self cellForRowAtIndexPath:destinationIndexPath];
-                cell.hidden = NO;
-                cell.alpha = 0.0;
-                [UIView animateWithDuration:0.1f
-                                 animations:^{
-                                     snapshot.center = cell.center;
-                                     snapshot.transform = CGAffineTransformIdentity;
-                                     snapshot.alpha = 0.0;
-                                     cell.alpha = 1.0;
-                                 }
-                                 completion:^(BOOL finished) {
-                                     sourceIndexPath = nil;
-                                     [snapshot removeFromSuperview];
-                                     snapshot = nil;
-                                 }];
-            }
+                
+            case UIGestureRecognizerStateEnded:
+                [self dropCell];
                 break;
+                
             default:
                 break;
+                
         }
     }
 }
 
+// React to the touch down of our own reorder view.
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    
     CGPoint location = [[touches anyObject] locationInView:self];
+    
+    // We only need to listen for touches if we are in editing mode and if the x location is in the range of reorder view.
     if (![self isEditing] || location.x < reorderX) {
         [super touchesBegan:touches withEvent:event];
         return;
     }
+    
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     if (indexPath) {
-        UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
-        
-        sourceIndexPath = indexPath;
-        snapshot = [self snapshotOfGroupCell:cell gorupIndex:[self groupIndexForRow:indexPath.row]];
-        
-        CGPoint origin = cell.frame.origin;
-        CGRect frame = snapshot.frame;
-        frame.origin = origin;
-        snapshot.frame = frame;
-        snapshot.alpha = 0.0;
-        [self addSubview:snapshot];
-        
-        gripY = location.y - origin.y;
-        
-        UITableViewCell *childCell = nil;
-        if ([[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue]) {
-            childCell = [self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0]];
-            moveWithChild = YES;
-        }
-        
-        [UIView animateWithDuration:0.1f
-                         animations:^{
-                             snapshot.transform = CGAffineTransformMakeScale(1.05, 1.05);
-                             snapshot.alpha = 0.98;
-                             cell.alpha = 0.0;
-                             if (childCell) {
-                                 childCell.alpha = 0.0;
-                             }
-                         }
-                         completion:^(BOOL finished) {
-                             cell.hidden = YES;
-                             if (childCell) {
-                                 childCell.hidden = YES;
-                             }
-                         }];
-
+        [self gripCellAtIndexPath:indexPath atLocation:location];
     }
 }
 
-- (UIView *)snapshotOfGroupCell:(UITableViewCell *)cell gorupIndex:(NSInteger)groupIndex {
+// React to the drop.
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    
+    // If we weren't dragging, pass on the call.
+    if (!sourceIndexPath) {
+        [super touchesEnded:touches withEvent:event];
+        return;
+    }
+    
+    [self dropCell];
+
+}
+
+// Grip the cell to start dragging.
+- (void)gripCellAtIndexPath:(NSIndexPath *)indexPath atLocation:(CGPoint)location {
+    
+    UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+    
+    sourceIndexPath = indexPath;
+    
+    // Make the snapshot of whatever we will be dragging and position it where the cell is.
+    snapshot = [self snapshotOfGroupCell:cell groupIndex:[self groupIndexForRow:indexPath.row]];
+    CGPoint origin = cell.frame.origin;
+    CGRect frame = snapshot.frame;
+    frame.origin = origin;
+    snapshot.frame = frame;
+    snapshot.alpha = 0.0;
+    [self addSubview:snapshot];
+    
+    // Remember the relative location inside the cell where we are dragging.
+    gripY = location.y - origin.y;
+    
+    UITableViewCell *childCell = nil;
+    if ([[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue]) {
+        childCell = [self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0]];
+        sourceHasChild = YES;
+    }
+    
+    // Animate to hide the real cell and display the snapshot.
+    [UIView animateWithDuration:0.1f
+                     animations:^{
+                         snapshot.alpha = 1.0;
+                         cell.alpha = 0.0;
+                         if (childCell) {
+                             childCell.alpha = 0.0;
+                         }
+                     }
+                     completion:^(BOOL finished) {
+                         cell.hidden = YES;
+                         if (childCell) {
+                             childCell.hidden = YES;
+                         }
+                     }];
+
+}
+
+// Drag the cell.
+- (void)dragCellToIndexPath:(NSIndexPath *)indexPath toLocation:(CGPoint)location {
+    
+    // Reposition the snapshot.
+    CGRect frame = snapshot.frame;
+    frame.origin.y = location.y - gripY;
+    snapshot.frame = frame;
+    
+    // Only swap rows if we are in a row with a different group index.
+    if (![indexPath isEqual:sourceIndexPath] && (indexPath.row == 0  || ([self groupIndexForRow:indexPath.row] != [self groupIndexForRow:indexPath.row - 1]))) {
+        
+        // Calculate where we are moving the group cell.
+        NSIndexPath *destinationIndexPath = indexPath;
+        BOOL destinationHasChild = [[expandedGroups objectAtIndex:[self groupIndexForRow:indexPath.row]] boolValue];
+        if (destinationHasChild && sourceIndexPath.row < indexPath.row) {
+            destinationIndexPath = [self getNextIndexPath:destinationIndexPath];
+        }
+        
+        // Make sure the set of expanded groups is in synch with data shown.
+        NSInteger sourceGroupIndex = [self groupIndexForRow:sourceIndexPath.row];
+        NSInteger destinationGroupIndex = [self groupIndexForRow:destinationIndexPath.row];
+        BOOL sourceExpanded = [[expandedGroups objectAtIndex:sourceGroupIndex] boolValue];
+        BOOL destinationExpanded = [[expandedGroups objectAtIndex:destinationGroupIndex] boolValue];
+        [expandedGroups replaceObjectAtIndex:sourceGroupIndex withObject:[NSNumber numberWithBool:destinationExpanded]];
+        [expandedGroups replaceObjectAtIndex:destinationGroupIndex withObject:[NSNumber numberWithBool:sourceExpanded]];
+        
+        // Move the rows to make room for the dragging cell.
+        [self moveRowAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+        if (sourceHasChild) {
+            NSIndexPath *sourceChildIndexPath = sourceIndexPath.row < indexPath.row ? sourceIndexPath : [self getNextIndexPath:sourceIndexPath];
+            NSIndexPath *destinationChildIndexPath = sourceIndexPath.row < indexPath.row ? destinationIndexPath : [self getNextIndexPath:destinationIndexPath];
+            [self moveRowAtIndexPath:sourceChildIndexPath toIndexPath:destinationChildIndexPath];
+        }
+        
+        // Remember where we are now.
+        sourceIndexPath = sourceHasChild && sourceIndexPath.row < indexPath.row ? [self getPreviousIndexPath:destinationIndexPath] : destinationIndexPath;
+        
+    }
+}
+
+// Drop the call back in the table.
+- (void)dropCell {
+    
+    // Make the cell visible again and get ready to animate them to full alpha.
+    UITableViewCell *childCell = nil;
+    if (sourceHasChild) {
+        childCell = [self cellForRowAtIndexPath:[self getNextIndexPath:sourceIndexPath]];
+        childCell.hidden = NO;
+        childCell.alpha = 0.0;
+    }
+    UITableViewCell *cell = [self cellForRowAtIndexPath:sourceIndexPath];
+    cell.hidden = NO;
+    cell.alpha = 0.0;
+    
+    // Animate to hide the snapshot and show back the cell.
+    [UIView animateWithDuration:0.1f
+                     animations:^{
+                         snapshot.center = cell.center;
+                         snapshot.transform = CGAffineTransformIdentity;
+                         snapshot.alpha = 0.0;
+                         cell.alpha = 1.0;
+                         if (childCell) {
+                             childCell.alpha = 1.0;
+                         }
+                     }
+                     completion:^(BOOL finished) {
+                         sourceIndexPath = nil;
+                         [snapshot removeFromSuperview];
+                         snapshot = nil;
+                     }];
+}
+
+// Helper method to get the index path for the next row.
+- (NSIndexPath *)getNextIndexPath:(NSIndexPath *)indexPath {
+    return [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0];
+}
+
+// Helper method to get the index path for the previous row.
+- (NSIndexPath *)getPreviousIndexPath:(NSIndexPath *)indexPath {
+    return [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:0];
+}
+
+// Helper method to get the snapshot of a dragging cell.
+- (UIView *)snapshotOfGroupCell:(UITableViewCell *)cell groupIndex:(NSInteger)groupIndex {
     
     UITableViewCell *childCell = nil;
     CGFloat height = cell.frame.size.height;
@@ -610,22 +684,29 @@ static BOOL moveWithChild;
         childCell = [self cellForRowAtIndexPath:[NSIndexPath indexPathForRow:([self rowForGroupIndex:groupIndex] + 1) inSection:0]];
         height += childCell.frame.size.height;
     }
+    
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(cell.frame.size.width, height), NO, 0);
     CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    // Draw the group cell
     [cell.layer renderInContext:context];
+    
+    // Draw the child table if needed
     if (childCell) {
         CGContextTranslateCTM(context, 0, cell.frame.size.height);
         [childCell.layer renderInContext:context];        
     }
+    
+    // Create the imade.
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
+    // Create the snapshot.
     UIView *snapshot = [[UIImageView alloc] initWithImage:image];
     snapshot.layer.masksToBounds = NO;
-    snapshot.layer.cornerRadius = 0.0;
     snapshot.layer.shadowOffset = CGSizeMake(-5.0, 0.0);
     snapshot.layer.shadowRadius = 5.0;
-    snapshot.layer.shadowOpacity = 0.4;
+    snapshot.layer.shadowOpacity = 0.25;
     
     return snapshot;
 }
