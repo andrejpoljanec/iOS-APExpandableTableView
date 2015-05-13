@@ -37,7 +37,7 @@ class ViewController: UIViewController, APExpandableTableViewDelegate {
     
     func expandableTableView(tableView: APExpandableTableView, cellForChildAtIndex childIndex: Int, groupIndex: Int) -> UITableViewCell {
         let cell = expandableTableView.dequeueReusableCellWithIdentifier("ChildCell") as UITableViewCell
-        cell.textLabel?.text = "\(data[groupIndex][groupIndex + 1])"
+        cell.textLabel?.text = "\(data[groupIndex][childIndex + 1])"
         return cell
     }
     

@@ -8,17 +8,7 @@
 
 import UIKit
 
-protocol APExpandableTableViewDelegate {
-    
-    // Similar to UITableViewDataSource, separately for group and child cells
-    func numberOfGroupsInExpandableTableView(tableView: APExpandableTableView) -> Int
-    func expandableTableView(tableView: APExpandableTableView, cellForGroupAtIndex groupIndex: Int) -> UITableViewCell
-    func expandableTableView(tableView: APExpandableTableView, numberOfChildrenForGroupAtIndex groupIndex:Int) -> Int
-    func expandableTableView(tableView: APExpandableTableView, cellForChildAtIndex childIndex: Int, groupIndex: Int) -> UITableViewCell
-    
-}
-
-class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDelegate {
+class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDelegate, APExpandableTableViewChildTableViewDelegate {
     
     // MARK: instance constants
     
@@ -68,21 +58,54 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         }
     }
     
+    // MARK: expandable table methods
+    
     func toggleGroupAtIndexPath(indexPath: NSIndexPath) {
         beginUpdates()
         let groupIndex = groupIndexForRow(indexPath.row)
         let expanded = (expandedGroups[groupIndex] as NSNumber).boolValue
-//        expandedGroups[groupIndex] = NSNumber(bool: !expanded)
+        expandedGroups[groupIndex] = NSNumber(bool: !expanded)
         let nextIndexPath = NSIndexPath(forRow: indexPath.row + 1, inSection: 0)
         if (expanded) {
-            
+            deleteRowsAtIndexPaths([nextIndexPath], withRowAnimation: UITableViewRowAnimation.Fade)
         } else {
-            
+            insertRowsAtIndexPaths([nextIndexPath], withRowAnimation: UITableViewRowAnimation.Fade)
         }
         endUpdates()
         
         let groupCell = cellForRowAtIndexPath(indexPath) as APExpandableTableViewGroupCell
         groupCell.updateIndicatorToExpanded(!expanded, animate: true)
+    }
+    
+    func collapseAllGroups() {
+        for (index, expanded) in enumerate(expandedGroups) {
+            if (expanded as NSNumber).boolValue {
+                toggleGroupAtIndexPath(NSIndexPath(forRow: index, inSection: 0))
+            }
+        }
+    }
+    
+    override func reloadData() {
+        let groupCount = expandableTableViewDelegate?.numberOfGroupsInExpandableTableView(self)
+        var currentIndex = expandedGroups.count - 1
+        while (groupCount > expandedGroups.count) {
+            currentIndex++
+            expandedGroups.append(NSNumber(bool: false))
+        }
+        while (groupCount < expandedGroups.count) {
+            expandedGroups.removeLast()
+        }
+        super.reloadData()
+    }
+    
+    func reloadChildAtIndex(groupIndex: Int, animate: Bool) {
+        if (!(expandedGroups[groupIndex] as NSNumber).boolValue) {
+            return
+        }
+        let row = rowForGroupIndex(groupIndex) + 1
+        let cell = cellForRowAtIndexPath(NSIndexPath(forRow: row, inSection: 0)) as APExpandableTableViewChildTableView
+//        cell.reloadDataWithAnimation(animate)
+        reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
     }
     
     // MARK: helper methods
@@ -136,7 +159,12 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         
         if (isChildCellAtRow(indexPath.row)) {
             
-            let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: CHILD_CELL)
+            let cell = APExpandableTableViewChildTableView(style: UITableViewCellStyle.Default, reuseIdentifier: CHILD_CELL)
+            
+            cell.groupIndex = groupIndex
+            cell.delegate = self
+            cell.reloadDataWithAnimation(false)
+            
             return cell
             
         } else {
@@ -168,6 +196,16 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         if (cell is APExpandableTableViewGroupCell) {
             toggleGroupAtIndexPath(indexPath)
         }
+    }
+    
+    // MARK: UITableViewChildTableViewDelegate
+    
+    func expandableTableViewChildTableView(tableView: APExpandableTableViewChildTableView, numberOfChildrenForGroupIndex groupIndex: Int) -> Int {
+        return expandableTableViewDelegate!.expandableTableView(self, numberOfChildrenForGroupAtIndex: groupIndex)
+    }
+    
+    func expandableTableViewChildTableView(tableView: APExpandableTableViewChildTableView, cellForChildAtIndex childIndex: Int, groupIndex: Int) -> UITableViewCell {
+        return expandableTableViewDelegate!.expandableTableView(self, cellForChildAtIndex: childIndex, groupIndex: groupIndex)
     }
     
 }
