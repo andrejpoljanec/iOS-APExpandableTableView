@@ -14,6 +14,9 @@
 		B4EB530A1B031ABA0074AF7C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = B4EB53081B031ABA0074AF7C /* LaunchScreen.xib */; };
 		B4EB53161B031ABA0074AF7C /* APExpandableTableViewSampleProjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EB53151B031ABA0074AF7C /* APExpandableTableViewSampleProjectTests.swift */; };
 		B4EB53211B031B090074AF7C /* APExpandableTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EB53201B031B090074AF7C /* APExpandableTableView.swift */; };
+		B4EB53231B031F120074AF7C /* APExpandableTableViewChildTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EB53221B031F120074AF7C /* APExpandableTableViewChildTableView.swift */; };
+		B4EB53251B0320630074AF7C /* APExpandableTableViewGroupCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EB53241B0320630074AF7C /* APExpandableTableViewGroupCell.swift */; };
+		B4EB53271B0320B70074AF7C /* APExpandableTableViewConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4EB53261B0320B70074AF7C /* APExpandableTableViewConstants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		B4EB53141B031ABA0074AF7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B4EB53151B031ABA0074AF7C /* APExpandableTableViewSampleProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APExpandableTableViewSampleProjectTests.swift; sourceTree = "<group>"; };
 		B4EB53201B031B090074AF7C /* APExpandableTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APExpandableTableView.swift; path = APExpandableTableView/APExpandableTableView.swift; sourceTree = "<group>"; };
+		B4EB53221B031F120074AF7C /* APExpandableTableViewChildTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APExpandableTableViewChildTableView.swift; path = APExpandableTableView/APExpandableTableViewChildTableView.swift; sourceTree = "<group>"; };
+		B4EB53241B0320630074AF7C /* APExpandableTableViewGroupCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APExpandableTableViewGroupCell.swift; path = APExpandableTableView/APExpandableTableViewGroupCell.swift; sourceTree = "<group>"; };
+		B4EB53261B0320B70074AF7C /* APExpandableTableViewConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APExpandableTableViewConstants.swift; path = APExpandableTableView/APExpandableTableViewConstants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +125,9 @@
 			isa = PBXGroup;
 			children = (
 				B4EB53201B031B090074AF7C /* APExpandableTableView.swift */,
+				B4EB53221B031F120074AF7C /* APExpandableTableViewChildTableView.swift */,
+				B4EB53241B0320630074AF7C /* APExpandableTableViewGroupCell.swift */,
+				B4EB53261B0320B70074AF7C /* APExpandableTableViewConstants.swift */,
 			);
 			name = APExpandableTableView;
 			sourceTree = "<group>";
@@ -226,6 +235,9 @@
 				B4EB53211B031B090074AF7C /* APExpandableTableView.swift in Sources */,
 				B4EB53021B031ABA0074AF7C /* ViewController.swift in Sources */,
 				B4EB53001B031ABA0074AF7C /* AppDelegate.swift in Sources */,
+				B4EB53251B0320630074AF7C /* APExpandableTableViewGroupCell.swift in Sources */,
+				B4EB53271B0320B70074AF7C /* APExpandableTableViewConstants.swift in Sources */,
+				B4EB53231B031F120074AF7C /* APExpandableTableViewChildTableView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +431,7 @@
 				B4EB531B1B031ABA0074AF7C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B4EB531C1B031ABA0074AF7C /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampleProjectTests" */ = {
 			isa = XCConfigurationList;
@@ -427,6 +440,7 @@
 				B4EB531E1B031ABA0074AF7C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

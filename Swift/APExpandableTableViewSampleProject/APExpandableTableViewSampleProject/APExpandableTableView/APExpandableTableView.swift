@@ -68,6 +68,23 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         }
     }
     
+    func toggleGroupAtIndexPath(indexPath: NSIndexPath) {
+        beginUpdates()
+        let groupIndex = groupIndexForRow(indexPath.row)
+        let expanded = (expandedGroups[groupIndex] as NSNumber).boolValue
+//        expandedGroups[groupIndex] = NSNumber(bool: !expanded)
+        let nextIndexPath = NSIndexPath(forRow: indexPath.row + 1, inSection: 0)
+        if (expanded) {
+            
+        } else {
+            
+        }
+        endUpdates()
+        
+        let groupCell = cellForRowAtIndexPath(indexPath) as APExpandableTableViewGroupCell
+        groupCell.updateIndicatorToExpanded(!expanded, animate: true)
+    }
+    
     // MARK: helper methods
     
     private func rowForGroupIndex(groupIndex: Int) -> Int {
@@ -114,13 +131,42 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         let groupIndex = groupIndexForRow(indexPath.row)
+        
         if (isChildCellAtRow(indexPath.row)) {
+            
             let cell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: CHILD_CELL)
             return cell
+            
         } else {
+            
+            let cell = APExpandableTableViewGroupCell(style: UITableViewCellStyle.Default, reuseIdentifier: GROUP_CELL)
+            
             let innerCell = expandableTableViewDelegate!.expandableTableView(self, cellForGroupAtIndex: indexPath.row)
-            return innerCell
+            cell.groupIndex = groupIndex
+            cell.attachInnerCell(innerCell)
+            
+            let expanded = (expandedGroups[groupIndex] as NSNumber).boolValue
+            cell.updateIndicatorToExpanded(expanded, animate: false)
+            
+            cell.backgroundColor = innerCell.backgroundColor
+            cell.selectionStyle = UITableViewCellSelectionStyle.None
+            
+            cell.tag = groupIndex
+            
+            return cell
+            
+        }
+    }
+    
+    // MARK: UITableViewDelegate
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let groupIndex = groupIndexForRow(indexPath.row)
+        let cell = cellForRowAtIndexPath(indexPath)
+        if (cell is APExpandableTableViewGroupCell) {
+            toggleGroupAtIndexPath(indexPath)
         }
     }
     
