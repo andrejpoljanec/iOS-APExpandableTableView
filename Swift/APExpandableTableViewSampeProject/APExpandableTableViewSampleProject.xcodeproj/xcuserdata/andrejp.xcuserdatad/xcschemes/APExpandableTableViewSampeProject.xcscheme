@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B4C67F731AF5795900699CB5"
-               BuildableName = "APExpandableTableViewSampeProject.app"
-               BlueprintName = "APExpandableTableViewSampeProject"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               BuildableName = "APExpandableTableViewSampleProject.app"
+               BlueprintName = "APExpandableTableViewSampleProject"
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B4C67F881AF5795900699CB5"
-               BuildableName = "APExpandableTableViewSampeProjectTests.xctest"
-               BlueprintName = "APExpandableTableViewSampeProjectTests"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               BuildableName = "APExpandableTableViewSampleProjectTests.xctest"
+               BlueprintName = "APExpandableTableViewSampleProjectTests"
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -45,7 +45,7 @@
                BlueprintIdentifier = "B4C67FAA1AF6079E00699CB5"
                BuildableName = "APExpandableTableViewTests.xctest"
                BlueprintName = "APExpandableTableViewTests"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -61,9 +61,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B4C67F881AF5795900699CB5"
-               BuildableName = "APExpandableTableViewSampeProjectTests.xctest"
-               BlueprintName = "APExpandableTableViewSampeProjectTests"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               BuildableName = "APExpandableTableViewSampleProjectTests.xctest"
+               BlueprintName = "APExpandableTableViewSampleProjectTests"
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -73,7 +73,7 @@
                BlueprintIdentifier = "B4C67FAA1AF6079E00699CB5"
                BuildableName = "APExpandableTableViewTests.xctest"
                BlueprintName = "APExpandableTableViewTests"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -81,9 +81,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B4C67F731AF5795900699CB5"
-            BuildableName = "APExpandableTableViewSampeProject.app"
-            BlueprintName = "APExpandableTableViewSampeProject"
-            ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+            BuildableName = "APExpandableTableViewSampleProject.app"
+            BlueprintName = "APExpandableTableViewSampleProject"
+            ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -100,9 +100,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B4C67F731AF5795900699CB5"
-            BuildableName = "APExpandableTableViewSampeProject.app"
-            BlueprintName = "APExpandableTableViewSampeProject"
-            ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+            BuildableName = "APExpandableTableViewSampleProject.app"
+            BlueprintName = "APExpandableTableViewSampleProject"
+            ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -118,9 +118,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B4C67F731AF5795900699CB5"
-            BuildableName = "APExpandableTableViewSampeProject.app"
-            BlueprintName = "APExpandableTableViewSampeProject"
-            ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+            BuildableName = "APExpandableTableViewSampleProject.app"
+            BlueprintName = "APExpandableTableViewSampleProject"
+            ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

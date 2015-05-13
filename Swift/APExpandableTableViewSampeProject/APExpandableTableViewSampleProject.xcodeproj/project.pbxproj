@@ -40,14 +40,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B4C67F741AF5795900699CB5 /* APExpandableTableViewSampeProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = APExpandableTableViewSampeProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4C67F741AF5795900699CB5 /* APExpandableTableViewSampleProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = APExpandableTableViewSampleProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4C67F781AF5795900699CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B4C67F791AF5795900699CB5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B4C67F7B1AF5795900699CB5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B4C67F7E1AF5795900699CB5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B4C67F801AF5795900699CB5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		B4C67F831AF5795900699CB5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		B4C67F891AF5795900699CB5 /* APExpandableTableViewSampeProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = APExpandableTableViewSampeProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4C67F891AF5795900699CB5 /* APExpandableTableViewSampleProjectTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = APExpandableTableViewSampleProjectTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4C67F8E1AF5795900699CB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B4C67F8F1AF5795900699CB5 /* APExpandableTableViewSampeProjectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APExpandableTableViewSampeProjectTests.swift; sourceTree = "<group>"; };
 		B4C67FE91AF60D3800699CB5 /* APExpandableTableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = APExpandableTableView.swift; path = APExpandableTableView/APExpandableTableView.swift; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		B4C67F6B1AF5795900699CB5 = {
 			isa = PBXGroup;
 			children = (
-				B4C67F761AF5795900699CB5 /* APExpandableTableViewSampeProject */,
+				B4C67F761AF5795900699CB5 /* APExpandableTableViewSampleProject */,
 				B4C67F8C1AF5795900699CB5 /* APExpandableTableViewSampeProjectTests */,
 				B4C67F751AF5795900699CB5 /* Products */,
 			);
@@ -83,13 +83,13 @@
 		B4C67F751AF5795900699CB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B4C67F741AF5795900699CB5 /* APExpandableTableViewSampeProject.app */,
-				B4C67F891AF5795900699CB5 /* APExpandableTableViewSampeProjectTests.xctest */,
+				B4C67F741AF5795900699CB5 /* APExpandableTableViewSampleProject.app */,
+				B4C67F891AF5795900699CB5 /* APExpandableTableViewSampleProjectTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B4C67F761AF5795900699CB5 /* APExpandableTableViewSampeProject */ = {
+		B4C67F761AF5795900699CB5 /* APExpandableTableViewSampleProject */ = {
 			isa = PBXGroup;
 			children = (
 				B4C67FE81AF60D1900699CB5 /* APExpandableTableView */,
@@ -100,6 +100,7 @@
 				B4C67F821AF5795900699CB5 /* LaunchScreen.xib */,
 				B4C67F771AF5795900699CB5 /* Supporting Files */,
 			);
+			name = APExpandableTableViewSampleProject;
 			path = APExpandableTableViewSampeProject;
 			sourceTree = "<group>";
 		};
@@ -139,9 +140,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B4C67F731AF5795900699CB5 /* APExpandableTableViewSampeProject */ = {
+		B4C67F731AF5795900699CB5 /* APExpandableTableViewSampleProject */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B4C67F931AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampeProject" */;
+			buildConfigurationList = B4C67F931AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampleProject" */;
 			buildPhases = (
 				B4C67F701AF5795900699CB5 /* Sources */,
 				B4C67F711AF5795900699CB5 /* Frameworks */,
@@ -152,14 +153,14 @@
 			);
 			dependencies = (
 			);
-			name = APExpandableTableViewSampeProject;
+			name = APExpandableTableViewSampleProject;
 			productName = APExpandableTableViewSampeProject;
-			productReference = B4C67F741AF5795900699CB5 /* APExpandableTableViewSampeProject.app */;
+			productReference = B4C67F741AF5795900699CB5 /* APExpandableTableViewSampleProject.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B4C67F881AF5795900699CB5 /* APExpandableTableViewSampeProjectTests */ = {
+		B4C67F881AF5795900699CB5 /* APExpandableTableViewSampleProjectTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B4C67F961AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampeProjectTests" */;
+			buildConfigurationList = B4C67F961AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampleProjectTests" */;
 			buildPhases = (
 				B4C67F851AF5795900699CB5 /* Sources */,
 				B4C67F861AF5795900699CB5 /* Frameworks */,
@@ -170,9 +171,9 @@
 			dependencies = (
 				B4C67F8B1AF5795900699CB5 /* PBXTargetDependency */,
 			);
-			name = APExpandableTableViewSampeProjectTests;
+			name = APExpandableTableViewSampleProjectTests;
 			productName = APExpandableTableViewSampeProjectTests;
-			productReference = B4C67F891AF5795900699CB5 /* APExpandableTableViewSampeProjectTests.xctest */;
+			productReference = B4C67F891AF5795900699CB5 /* APExpandableTableViewSampleProjectTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -193,7 +194,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B4C67F6F1AF5795900699CB5 /* Build configuration list for PBXProject "APExpandableTableViewSampeProject" */;
+			buildConfigurationList = B4C67F6F1AF5795900699CB5 /* Build configuration list for PBXProject "APExpandableTableViewSampleProject" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -206,8 +207,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B4C67F731AF5795900699CB5 /* APExpandableTableViewSampeProject */,
-				B4C67F881AF5795900699CB5 /* APExpandableTableViewSampeProjectTests */,
+				B4C67F731AF5795900699CB5 /* APExpandableTableViewSampleProject */,
+				B4C67F881AF5795900699CB5 /* APExpandableTableViewSampleProjectTests */,
 			);
 		};
 /* End PBXProject section */
@@ -256,7 +257,7 @@
 /* Begin PBXTargetDependency section */
 		B4C67F8B1AF5795900699CB5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = B4C67F731AF5795900699CB5 /* APExpandableTableViewSampeProject */;
+			target = B4C67F731AF5795900699CB5 /* APExpandableTableViewSampleProject */;
 			targetProxy = B4C67F8A1AF5795900699CB5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -366,7 +367,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = APExpandableTableViewSampeProject/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = APExpandableTableViewSampleProject;
 			};
 			name = Debug;
 		};
@@ -376,7 +377,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = APExpandableTableViewSampeProject/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = APExpandableTableViewSampleProject;
 			};
 			name = Release;
 		};
@@ -394,7 +395,7 @@
 				);
 				INFOPLIST_FILE = APExpandableTableViewSampeProjectTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = APExpandableTableViewSampleProjectTests;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/APExpandableTableViewSampeProject.app/APExpandableTableViewSampeProject";
 			};
 			name = Debug;
@@ -409,7 +410,7 @@
 				);
 				INFOPLIST_FILE = APExpandableTableViewSampeProjectTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = APExpandableTableViewSampleProjectTests;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/APExpandableTableViewSampeProject.app/APExpandableTableViewSampeProject";
 			};
 			name = Release;
@@ -417,7 +418,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B4C67F6F1AF5795900699CB5 /* Build configuration list for PBXProject "APExpandableTableViewSampeProject" */ = {
+		B4C67F6F1AF5795900699CB5 /* Build configuration list for PBXProject "APExpandableTableViewSampleProject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B4C67F911AF5795900699CB5 /* Debug */,
@@ -426,21 +427,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B4C67F931AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampeProject" */ = {
+		B4C67F931AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampleProject" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B4C67F941AF5795900699CB5 /* Debug */,
 				B4C67F951AF5795900699CB5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
-		B4C67F961AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampeProjectTests" */ = {
+		B4C67F961AF5795900699CB5 /* Build configuration list for PBXNativeTarget "APExpandableTableViewSampleProjectTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B4C67F971AF5795900699CB5 /* Debug */,
 				B4C67F981AF5795900699CB5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

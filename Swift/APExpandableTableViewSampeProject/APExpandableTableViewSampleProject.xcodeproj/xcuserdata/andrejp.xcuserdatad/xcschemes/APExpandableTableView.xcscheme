@@ -17,7 +17,7 @@
                BlueprintIdentifier = "B4C67FC51AF608C800699CB5"
                BuildableName = "APExpandableTableView.framework"
                BlueprintName = "APExpandableTableView"
-               ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+               ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -45,7 +45,7 @@
             BlueprintIdentifier = "B4C67FC51AF608C800699CB5"
             BuildableName = "APExpandableTableView.framework"
             BlueprintName = "APExpandableTableView"
-            ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+            ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -63,7 +63,7 @@
             BlueprintIdentifier = "B4C67FC51AF608C800699CB5"
             BuildableName = "APExpandableTableView.framework"
             BlueprintName = "APExpandableTableView"
-            ReferencedContainer = "container:APExpandableTableViewSampeProject.xcodeproj">
+            ReferencedContainer = "container:APExpandableTableViewSampleProject.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
