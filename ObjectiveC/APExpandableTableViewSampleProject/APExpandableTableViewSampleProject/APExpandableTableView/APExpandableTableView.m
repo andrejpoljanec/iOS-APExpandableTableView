@@ -332,7 +332,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete && [self.expandableTableViewDelegate respondsToSelector:@selector(expandableTableView:deleteGroupAtIndex:)]) {
         [self.expandableTableViewDelegate expandableTableView:self deleteGroupAtIndex:[self groupIndexForRow:indexPath.row]];
         [self reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        [expandedGroups removeObjectAtIndex:indexPath.row];
+        [expandedGroups removeObjectAtIndex:[self groupIndexForRow:indexPath.row]];
     }
 }
 
