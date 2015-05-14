@@ -195,7 +195,7 @@
         
         // Set up child cell
         
-        NSString *childCellID = @"ChildCell";
+        NSString *childCellID = @"APExpandableTableViewChildCell";
         APExpandableTableViewChildTableView *cell = (APExpandableTableViewChildTableView *)[self dequeueReusableCellWithIdentifier:childCellID];
         if (cell == nil) {
             cell = [[APExpandableTableViewChildTableView alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:childCellID];
@@ -212,7 +212,7 @@
         // Set up group cell
         // Group cell consists of an expand indicator and the cell provided by the delegate, which here is called innerCell
         
-        NSString *groupCellID = @"GroupCell";
+        NSString *groupCellID = @"APExpandableTableViewGroupCell";
         UITableViewCell *innerCell;
         APExpandableTableViewGroupCell *cell = (APExpandableTableViewGroupCell *)[self dequeueReusableCellWithIdentifier:groupCellID];
         if (cell == nil) {
