@@ -16,7 +16,7 @@ class APExpandableTableViewGroupCell: UITableViewCell {
     var cell: UITableViewCell?
     var groupIndex: Int?
    
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCellStyle, reuseIdentifier: String!) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         initialize()
     }

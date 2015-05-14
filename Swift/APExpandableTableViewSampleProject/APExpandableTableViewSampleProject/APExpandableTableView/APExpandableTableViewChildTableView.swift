@@ -36,7 +36,7 @@ class APExpandableTableViewChildTableView: UITableViewCell, UITableViewDataSourc
     }
     var tableView: UITableView = UITableView()
     
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCellStyle, reuseIdentifier: String!) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         initialize()
@@ -65,8 +65,8 @@ class APExpandableTableViewChildTableView: UITableViewCell, UITableViewDataSourc
         super.layoutSubviews()
         
         var tableHeight: CGFloat = 0
-        let childrenCount = delegate?.expandableTableViewChildTableView(self, numberOfChildrenForGroupIndex: groupIndex!) ?? 0
-        for var index = 0; index < childrenCount; index++ {
+        let childCount = delegate?.expandableTableViewChildTableView(self, numberOfChildrenForGroupIndex: groupIndex!) ?? 0
+        for index in 0 ..< childCount {
             tableHeight += self.delegate?.expandableTableViewChildTableView?(self, heightForChildAtIndex: index, groupIndex: self.groupIndex!) ?? APExpandableTableViewConstants.DEFAULT_CHILD_CELL_HEIGHT
         }
         tableView.frame = CGRectMake(APExpandableTableViewConstants.INSET_CHILD_TABLE, 0, contentView.frame.size.width - APExpandableTableViewConstants.INSET_CHILD_TABLE, tableHeight)

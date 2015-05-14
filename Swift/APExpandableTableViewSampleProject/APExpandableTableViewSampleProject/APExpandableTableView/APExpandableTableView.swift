@@ -12,8 +12,8 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
     
     // MARK: instance constants
     
-    private let CHILD_CELL = "ChildCell"
-    private let GROUP_CELL = "GroupCell"
+    private let CHILD_CELL = "APExpandableTableViewChildCell"
+    private let GROUP_CELL = "APExpandableTableViewGroupCell"
     
     // MARK: instance variables
     
@@ -43,8 +43,8 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         delegate = self
         dataSource = self
         
-        registerClass(UITableViewCell.self, forCellReuseIdentifier: GROUP_CELL)
-        registerClass(UITableViewCell.self, forCellReuseIdentifier: CHILD_CELL)
+        registerClass(APExpandableTableViewGroupCell.self, forCellReuseIdentifier: GROUP_CELL)
+        registerClass(APExpandableTableViewChildTableView.self, forCellReuseIdentifier: CHILD_CELL)
         
         separatorStyle = UITableViewCellSeparatorStyle.SingleLine
         delaysContentTouches = false
@@ -104,7 +104,7 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         }
         let row = rowForGroupIndex(groupIndex) + 1
         let cell = cellForRowAtIndexPath(NSIndexPath(forRow: row, inSection: 0)) as APExpandableTableViewChildTableView
-//        cell.reloadDataWithAnimation(animate)
+        cell.reloadDataWithAnimation(animate)
         reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
     }
     
@@ -159,7 +159,7 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         
         if (isChildCellAtRow(indexPath.row)) {
             
-            let cell = APExpandableTableViewChildTableView(style: UITableViewCellStyle.Default, reuseIdentifier: CHILD_CELL)
+            let cell = dequeueReusableCellWithIdentifier(CHILD_CELL) as? APExpandableTableViewChildTableView ?? APExpandableTableViewChildTableView(style: UITableViewCellStyle.Default, reuseIdentifier: CHILD_CELL)
             
             cell.groupIndex = groupIndex
             cell.delegate = self
@@ -169,7 +169,7 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
             
         } else {
             
-            let cell = APExpandableTableViewGroupCell(style: UITableViewCellStyle.Default, reuseIdentifier: GROUP_CELL)
+            let cell = dequeueReusableCellWithIdentifier(GROUP_CELL) as? APExpandableTableViewGroupCell ?? APExpandableTableViewGroupCell(style: UITableViewCellStyle.Default, reuseIdentifier: GROUP_CELL)
             
             let innerCell = expandableTableViewDelegate!.expandableTableView(self, cellForGroupAtIndex: indexPath.row)
             cell.groupIndex = groupIndex
@@ -189,6 +189,21 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
     }
     
     // MARK: UITableViewDelegate
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        let groupIndex = groupIndexForRow(indexPath.row)
+        let childCell = isChildCellAtRow(indexPath.row)
+        if (childCell) {
+            let childCount = expandableTableViewDelegate?.expandableTableView(self, numberOfChildrenForGroupAtIndex: groupIndex) ?? 0
+            var tableHeight: CGFloat = 0
+            for index in 0 ..< childCount {
+                tableHeight += expandableTableViewDelegate?.expandableTableView?(self, heightForChildAtIndex: index, groupIndex: groupIndex) ?? APExpandableTableViewConstants.DEFAULT_CHILD_CELL_HEIGHT
+            }
+            return tableHeight
+        } else {
+            return expandableTableViewDelegate?.expandableTableView?(self, heightForGroupAtIndex: groupIndex) ?? APExpandableTableViewConstants.DEFAULT_GROUP_CELL_HEIGHT
+        }
+    }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let groupIndex = groupIndexForRow(indexPath.row)
