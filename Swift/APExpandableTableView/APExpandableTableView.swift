@@ -482,17 +482,20 @@ class APExpandableTableView: UITableView, UITableViewDataSource, UITableViewDele
         let indexPath = indexPathForRowAtPoint(location)
         
         // Only drag if we know where we are coming from and where we are going.
-        if (indexPath != nil && Reordering.sourceIndexPath != nil) {
+        if (Reordering.sourceIndexPath != nil) {
             
             switch gestureRecognizer.state {
                 
             case UIGestureRecognizerState.Changed:
                 
-                dragCellToIndexPath(indexPath!, location: location)
+                if (indexPath != nil) {
+                    dragCellToIndexPath(indexPath!, location: location)
+                }
                 
             case UIGestureRecognizerState.Ended:
                 
                 dropCell()
+                
                 
             default:
                 

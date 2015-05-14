@@ -500,12 +500,14 @@ static CGFloat reorderX = 0;
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     
     // Only drag if we know where we are coming from and where we are going.
-    if (indexPath && sourceIndexPath) {
+    if (sourceIndexPath) {
         
         switch (gestureRecognizer.state) {
                 
             case UIGestureRecognizerStateChanged:
-                [self dragCellToIndexPath:indexPath toLocation:location];
+                if (indexPath) {
+                    [self dragCellToIndexPath:indexPath toLocation:location];                    
+                }
                 break;
                 
             case UIGestureRecognizerStateEnded:
