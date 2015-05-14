@@ -55,6 +55,43 @@ class ViewController: UIViewController, APExpandableTableViewDelegate {
         return data.count
     }
     
+    func expandableTableView(tableView: APExpandableTableView, canDeleteGroupAtIndex groupIndex: Int) -> Bool {
+        return true
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, deleteGroupAtIndex groupIndex: Int) {
+        data.removeObjectAtIndex(groupIndex)
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, canMoveGroupAtIndex groupIndex: Int) -> Bool {
+        return true
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, moveGroupAtIndex sourceGroupIndex: Int, toIndex destinationGroupIndex: Int) {
+        let moveObject: AnyObject = data[sourceGroupIndex]
+        data.removeObjectAtIndex(sourceGroupIndex)
+        data.insertObject(moveObject, atIndex: destinationGroupIndex)
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, canMoveChildAtIndex childIndex: Int, groupIndex: Int) -> Bool {
+        return true
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, moveChildAtIndex sourceChildIndex: Int, toIndex destinationChildIndex: Int, groupIndex: Int) {
+        var groupArray = data[groupIndex] as [String]
+        let moveObject: String = groupArray[sourceChildIndex + 1]
+        groupArray.removeAtIndex(sourceChildIndex + 1)
+        groupArray.insert(moveObject, atIndex: destinationChildIndex + 1)
+        data[groupIndex] = groupArray
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, canDeleteChildAtIndex childIndex: Int, groupIndex: Int) -> Bool {
+        return true
+    }
+    
+    func expandableTableView(tableView: APExpandableTableView, deleteChildAtIndex childIndex: Int, groupIndex: Int) {
+        data[groupIndex].removeObjectAtIndex(childIndex + 1)
+    }
     
 }
 

@@ -23,7 +23,7 @@ import UIKit
     
     // Visual
     optional func expandableTableViewChildTableView(tableView: APExpandableTableViewChildTableView, heightForChildAtIndex childIndex: Int, groupIndex: Int) -> CGFloat
-    optional func expandableTableViewChildTableView(tableView: APExpandableTableViewChildTableView, childAccessoryViewForChildAtIndex childIndex: Int, groupIndex: Int) -> UIView
+    optional func expandableTableViewChildTableView(tableView: APExpandableTableViewChildTableView, childAccessoryViewForChildAtIndex childIndex: Int, groupIndex: Int) -> UIView?
 }
 
 class APExpandableTableViewChildTableView: UITableViewCell, UITableViewDataSource, UITableViewDelegate {
@@ -71,7 +71,11 @@ class APExpandableTableViewChildTableView: UITableViewCell, UITableViewDataSourc
         }
         tableView.frame = CGRectMake(APExpandableTableViewConstants.INSET_CHILD_TABLE, 0, contentView.frame.size.width - APExpandableTableViewConstants.INSET_CHILD_TABLE, tableHeight)
     }
-    
+
+    override func setEditing(editing: Bool, animated: Bool) {
+        tableView.setEditing(editing, animated: animated)
+    }
+
     func reloadDataWithAnimation(animate: Bool) {
         if (animate) {
             tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
@@ -95,12 +99,32 @@ class APExpandableTableViewChildTableView: UITableViewCell, UITableViewDataSourc
         return cell
     }
     
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return delegate?.expandableTableViewChildTableView?(self, canDeleteChildAtIndex: indexPath.row, groupIndex: groupIndex!) ?? false
+    }
+    
+    func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return delegate?.expandableTableViewChildTableView?(self, canMoveChildAtIndex: indexPath.row, groupIndex: groupIndex!) ?? false
+    }
+    
+    func tableView(tableView: UITableView, moveRowAtIndexPath sourceIndexPath: NSIndexPath, toIndexPath destinationIndexPath: NSIndexPath) {
+        delegate?.expandableTableViewChildTableView?(self, moveChildAtIndex: sourceIndexPath.row, toIndex: destinationIndexPath.row, groupIndex: groupIndex!)
+    }
+    
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.Delete) {
+            delegate?.expandableTableViewChildTableView!(self, deleteChildAtIndex: indexPath.row, groupIndex: groupIndex!)
+            tableView.reloadSections(NSIndexSet(index: 0), withRowAnimation: UITableViewRowAnimation.Fade)
+        }
+    }
+    
+    // MARK: UITableViewDelegate
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        delegate?.expandableTableViewChildTableView?(self, didSelectChildAtIndex: indexPath.row, groupIndex: groupIndex!)
+    }
+    
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return delegate?.expandableTableViewChildTableView?(self, heightForChildAtIndex: indexPath.row, groupIndex: groupIndex!) ?? APExpandableTableViewConstants.DEFAULT_CHILD_CELL_HEIGHT
     }
-    
-    override func setEditing(editing: Bool, animated: Bool) {
-        tableView.setEditing(editing, animated: animated)
-    }
-    
 }

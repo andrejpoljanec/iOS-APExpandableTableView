@@ -43,7 +43,7 @@ import UIKit
     optional func indicatorOnLeftForExpandableTableView(tableView: APExpandableTableView) -> Bool
     optional func expandIndicatorForExpandableTableView(tableView: APExpandableTableView) -> UIImage
     // Accessorry view.
-    optional func expandableTableView(tableView: APExpandableTableView, groupAccessoryViewForGroupIndex groupIndex: Int) -> UIView
-    optional func expandableTableView(tableView: APExpandableTableView, childAccessoryViewForChildIndex childIndex: Int, groupIndex: Int) -> UIView
+    optional func expandableTableView(tableView: APExpandableTableView, groupAccessoryViewForGroupIndex groupIndex: Int) -> UIView?
+    optional func expandableTableView(tableView: APExpandableTableView, childAccessoryViewForChildIndex childIndex: Int, groupIndex: Int) -> UIView?
     
 }
