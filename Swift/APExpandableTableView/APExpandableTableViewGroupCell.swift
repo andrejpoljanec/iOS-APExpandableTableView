@@ -39,20 +39,31 @@ class APExpandableTableViewGroupCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         contentView.autoresizesSubviews = true
+        
         if (!expandable) {
+            
+            // If not expandable, there is no need for an indicator and the inner cell can take up the whole space
             cell?.frame = CGRectMake(0, 0, contentView.bounds.size.width, contentView.bounds.size.height)
             indicator.hidden = true
+            
         } else if (indicatorOnLeft) {
+            
+            // Layout if indicator is on the left
             indicator.frame = CGRectMake(0, 0, APExpandableTableViewConstants.INDICATOR_WIDTH, contentView.bounds.size.height)
             cell?.frame = CGRectMake(APExpandableTableViewConstants.INDICATOR_WIDTH - APExpandableTableViewConstants.INSET_INNER_CELL, 0, contentView.bounds.size.width - APExpandableTableViewConstants.INDICATOR_WIDTH + APExpandableTableViewConstants.INSET_INNER_CELL, contentView.bounds.size.height)
             indicator.hidden = false
+            
         } else {
+            
+            // Layout if indicator is on the right
             indicator.frame = CGRectMake(contentView.bounds.size.width - APExpandableTableViewConstants.INDICATOR_WIDTH - APExpandableTableViewConstants.DEFAULT_PADDING, 0, APExpandableTableViewConstants.INDICATOR_WIDTH, contentView.bounds.size.height)
             cell?.frame = CGRectMake(0, 0, contentView.bounds.size.width - APExpandableTableViewConstants.INDICATOR_WIDTH, contentView.bounds.size.height)
             indicator.hidden = false
+            
         }
     }
     
+    // Attaches the inner cell obtained from the delegate
     func attachInnerCell(innerCell: UITableViewCell) {
         cell?.removeFromSuperview()
         cell = innerCell
@@ -60,24 +71,30 @@ class APExpandableTableViewGroupCell: UITableViewCell {
         contentView.addSubview(cell!)
     }
     
+    // Update the indicator to show whether the group is expanded or collapsed
     func updateIndicatorToExpanded(expanded: Bool, animate: Bool) {
+        
         if (animate) {
             UIView.beginAnimations("animateIndicator", context: nil)
             UIView.setAnimationDuration(0.2)
         }
         
+        // Rotate the indicator by 180 degrees
         indicator.transform = CGAffineTransformMakeRotation(expanded ? CGFloat(M_PI) : 0)
         
         if (animate) {
             UIView.commitAnimations()
         }
+        
     }
     
+    // struct to hold type vars
     struct DefaultImage {
         static var indicatorImage = UIImage()
         static var onceToken: dispatch_once_t = 0
     }
     
+    // Draw a default image if none is provided, just a black arrow
     private func defaultIndicatorImage() -> UIImage {
         dispatch_once(&DefaultImage.onceToken) {
             UIGraphicsBeginImageContextWithOptions(CGSizeMake(20, 20), false, 0)
