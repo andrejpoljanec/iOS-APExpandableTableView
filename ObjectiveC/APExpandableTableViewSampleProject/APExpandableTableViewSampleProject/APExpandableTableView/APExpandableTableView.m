@@ -621,6 +621,7 @@ static CGFloat reorderX = 0;
         
         // Move the rows to make room for the dragging cell.
         [self moveRowAtIndexPath:sourceIndexPath toIndexPath:destinationIndexPath];
+        [self.expandableTableViewDelegate expandableTableView:self moveGroupAtIndex:sourceGroupIndex toIndex:destinationGroupIndex];
         if (sourceHasChild) {
             NSIndexPath *sourceChildIndexPath = sourceIndexPath.row < indexPath.row ? sourceIndexPath : [self getNextIndexPath:sourceIndexPath];
             NSIndexPath *destinationChildIndexPath = sourceIndexPath.row < indexPath.row ? destinationIndexPath : [self getNextIndexPath:destinationIndexPath];
@@ -647,10 +648,13 @@ static CGFloat reorderX = 0;
     cell.hidden = NO;
     cell.alpha = 0.0;
     
+    CGRect frame = snapshot.frame;
+    frame.origin.y = cell.frame.origin.y;
+    
     // Animate to hide the snapshot and show back the cell.
     [UIView animateWithDuration:0.1f
                      animations:^{
-                         snapshot.center = cell.center;
+                         snapshot.frame = frame;
                          snapshot.transform = CGAffineTransformIdentity;
                          snapshot.alpha = 0.0;
                          cell.alpha = 1.0;
